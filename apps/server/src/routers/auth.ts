@@ -62,6 +62,12 @@ export const authRouter = router({
         lastName: input.lastName,
         tenantId,
         role: "admin" as string,
+        tenant: {
+          id: tenantId,
+          name: input.tenantName,
+          slug: tenantSlug,
+          onboardingComplete: false,
+        },
       },
     };
   }),
@@ -82,6 +88,10 @@ export const authRouter = router({
 
     const token = createJWT(user.id, user.tenantId, user.email, user.role);
 
+    const tenant = await db.query.tenants.findFirst({
+      where: (t, { eq }) => eq(t.id, user.tenantId),
+    });
+
     return {
       token,
       user: {
@@ -91,6 +101,14 @@ export const authRouter = router({
         lastName: user.lastName,
         tenantId: user.tenantId,
         role: user.role,
+        tenant: tenant
+          ? {
+              id: tenant.id,
+              name: tenant.name,
+              slug: tenant.slug,
+              onboardingComplete: tenant.onboardingComplete,
+            }
+          : null,
       },
     };
   }),
@@ -104,6 +122,10 @@ export const authRouter = router({
       throw new Error("User not found");
     }
 
+    const tenant = await db.query.tenants.findFirst({
+      where: (t, { eq }) => eq(t.id, user.tenantId),
+    });
+
     return {
       id: user.id,
       email: user.email,
@@ -111,6 +133,14 @@ export const authRouter = router({
       lastName: user.lastName,
       tenantId: user.tenantId,
       role: user.role,
+      tenant: tenant
+        ? {
+            id: tenant.id,
+            name: tenant.name,
+            slug: tenant.slug,
+            onboardingComplete: tenant.onboardingComplete,
+          }
+        : null,
     };
   }),
 });

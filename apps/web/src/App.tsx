@@ -10,13 +10,26 @@ import { CalendarPage } from "./pages/CalendarPage";
 import { LeadsPage } from "./pages/LeadsPage";
 import { SiteRoute } from "./public-site/SiteRoute";
 import { MarketingHome } from "./marketing/MarketingHome";
+import { BasicsStep } from "./onboarding/BasicsStep";
+import { StyleStep } from "./onboarding/StyleStep";
+import { BuildingStep } from "./onboarding/BuildingStep";
+import { PreviewStep } from "./onboarding/PreviewStep";
 import { useAuthStore } from "./store/auth";
 import { trpc } from "./trpc";
 import "./App.css";
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore();
-  return token ? <>{children}</> : <Navigate to="/" />;
+  return token ? <>{children}</> : <Navigate to="/login" />;
+}
+
+function OnboardingGate({ children }: { children: React.ReactNode }) {
+  const { token, user } = useAuthStore();
+  if (!token) return <Navigate to="/login" />;
+  if (user && user.tenant && !user.tenant.onboardingComplete) {
+    return <Navigate to="/onboarding/basics" />;
+  }
+  return <>{children}</>;
 }
 
 function App() {
@@ -40,56 +53,89 @@ function App() {
         <Route
           path="/dashboard"
           element={
-            <PrivateRoute>
+            <OnboardingGate>
               <DashboardPage />
-            </PrivateRoute>
+            </OnboardingGate>
           }
         />
         <Route
           path="/venues"
           element={
-            <PrivateRoute>
+            <OnboardingGate>
               <VenuesPage />
-            </PrivateRoute>
+            </OnboardingGate>
           }
         />
         <Route
           path="/events"
           element={
-            <PrivateRoute>
+            <OnboardingGate>
               <EventsPage />
-            </PrivateRoute>
+            </OnboardingGate>
           }
         />
         <Route
           path="/staff"
           element={
-            <PrivateRoute>
+            <OnboardingGate>
               <StaffPage />
-            </PrivateRoute>
+            </OnboardingGate>
           }
         />
         <Route
           path="/analytics"
           element={
-            <PrivateRoute>
+            <OnboardingGate>
               <AnalyticsPage />
-            </PrivateRoute>
+            </OnboardingGate>
           }
         />
         <Route
           path="/calendar"
           element={
-            <PrivateRoute>
+            <OnboardingGate>
               <CalendarPage />
-            </PrivateRoute>
+            </OnboardingGate>
           }
         />
         <Route
           path="/leads"
           element={
-            <PrivateRoute>
+            <OnboardingGate>
               <LeadsPage />
+            </OnboardingGate>
+          }
+        />
+        <Route path="/onboarding" element={<Navigate to="/onboarding/basics" />} />
+        <Route
+          path="/onboarding/basics"
+          element={
+            <PrivateRoute>
+              <BasicsStep />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/onboarding/style"
+          element={
+            <PrivateRoute>
+              <StyleStep />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/onboarding/building"
+          element={
+            <PrivateRoute>
+              <BuildingStep />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/onboarding/preview"
+          element={
+            <PrivateRoute>
+              <PreviewStep />
             </PrivateRoute>
           }
         />

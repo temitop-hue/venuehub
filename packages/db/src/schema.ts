@@ -20,6 +20,7 @@ export const tenants = mysqlTable("tenants", {
   slug: varchar("slug", { length: 255 }).notNull().unique(),
   description: text("description"),
   logo: varchar("logo", { length: 255 }),
+  onboardingComplete: boolean("onboarding_complete").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
