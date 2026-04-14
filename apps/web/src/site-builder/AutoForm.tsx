@@ -1,5 +1,6 @@
 import React from "react";
 import type { FieldDef } from "@venuehub/shared";
+import { MediaUploadField } from "./MediaUploadField";
 
 const colors = {
   border: "#e8e8e4",
@@ -158,6 +159,14 @@ function FieldControl({
             </option>
           ))}
         </select>
+      );
+    case "media":
+      return (
+        <MediaUploadField
+          value={value}
+          onChange={(v) => onChange(v)}
+          accept={t.accept}
+        />
       );
     case "json": {
       const pretty = stringifyForEditor(value);

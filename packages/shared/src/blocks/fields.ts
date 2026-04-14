@@ -10,6 +10,7 @@ export type FieldType =
   | { kind: "number"; min?: number; max?: number; step?: number }
   | { kind: "boolean" }
   | { kind: "select"; options: { value: string; label: string }[] }
+  | { kind: "media"; accept: "image" | "video" | "image-or-video"; placeholder?: string }
   | { kind: "json"; placeholder?: string };
 
 export interface FieldDef {
@@ -34,8 +35,8 @@ export const BLOCK_FIELDS: Record<string, FieldDef[]> = {
     },
     {
       name: "backgroundUrl",
-      label: "Background URL",
-      type: { kind: "url", placeholder: "https://…" },
+      label: "Background media",
+      type: { kind: "media", accept: "image-or-video" },
     },
     {
       name: "overlayOpacity",
@@ -177,9 +178,9 @@ export const BLOCK_FIELDS: Record<string, FieldDef[]> = {
     },
     {
       name: "backgroundValue",
-      label: "Background value",
-      description: "Hex color (e.g. #0d0d0d) or image URL",
-      type: { kind: "text" },
+      label: "Background image",
+      description: "Image behind the CTA. For a solid color instead, set Background to 'color' and paste a hex like #0d0d0d here.",
+      type: { kind: "media", accept: "image" },
     },
     {
       name: "overlayOpacity",

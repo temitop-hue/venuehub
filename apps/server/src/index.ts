@@ -26,6 +26,7 @@ import { leadsRouter } from "./routers/leads";
 import { publicSiteRouter } from "./routers/publicSite";
 import { onboardingRouter } from "./routers/onboarding";
 import { siteAdminRouter } from "./routers/siteAdmin";
+import { registerUploadRoutes } from "./uploads";
 
 const app = express();
 
@@ -68,6 +69,9 @@ const appRouter = router({
   onboarding: onboardingRouter,
   siteAdmin: siteAdminRouter,
 });
+
+// File uploads (Railway volume mounted at /data/uploads)
+registerUploadRoutes(app);
 
 // tRPC handler
 app.use(
