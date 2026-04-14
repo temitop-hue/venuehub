@@ -9,6 +9,23 @@ export function EventsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
 
+  const [filters, setFilters] = useState<{
+    venueId: string;
+    status: "" | "pending" | "confirmed" | "completed" | "cancelled";
+    dateFrom: string;
+    dateTo: string;
+  }>({ venueId: "", status: "", dateFrom: "", dateTo: "" });
+
+  const filterInput = {
+    venueId: filters.venueId ? parseInt(filters.venueId) : undefined,
+    status: filters.status || undefined,
+    dateFrom: filters.dateFrom || undefined,
+    dateTo: filters.dateTo || undefined,
+  };
+  const hasActiveFilters = Boolean(
+    filterInput.venueId || filterInput.status || filterInput.dateFrom || filterInput.dateTo,
+  );
+
   const [formData, setFormData] = useState({
     venueId: "",
     title: "",
@@ -25,7 +42,7 @@ export function EventsPage() {
     advanceAmount: "",
   });
 
-  const eventsQuery = trpc.events.list.useQuery();
+  const eventsQuery = trpc.events.list.useQuery(filterInput);
   const venuesQuery = trpc.venues.list.useQuery();
 
   const createMutation = trpc.events.create.useMutation({
@@ -475,10 +492,90 @@ export function EventsPage() {
           </div>
         )}
 
+        {/* Filters */}
+        <div
+          style={{
+            background: "white",
+            padding: "1rem 1.5rem",
+            borderRadius: "0.5rem",
+            marginBottom: "1rem",
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr) auto",
+            gap: "1rem",
+            alignItems: "end",
+          }}
+        >
+          <div>
+            <label style={{ display: "block", marginBottom: "0.25rem", fontSize: "0.875rem", fontWeight: 500, color: "#374151" }}>Venue</label>
+            <select
+              value={filters.venueId}
+              onChange={(e) => setFilters({ ...filters, venueId: e.target.value })}
+              style={{ width: "100%", padding: "0.5rem", border: "1px solid #ddd", borderRadius: "0.375rem" }}
+            >
+              <option value="">All venues</option>
+              {(venuesQuery.data || []).map((v) => (
+                <option key={v.id} value={v.id}>{v.name}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label style={{ display: "block", marginBottom: "0.25rem", fontSize: "0.875rem", fontWeight: 500, color: "#374151" }}>Status</label>
+            <select
+              value={filters.status}
+              onChange={(e) => setFilters({ ...filters, status: e.target.value as typeof filters.status })}
+              style={{ width: "100%", padding: "0.5rem", border: "1px solid #ddd", borderRadius: "0.375rem" }}
+            >
+              <option value="">All statuses</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div>
+            <label style={{ display: "block", marginBottom: "0.25rem", fontSize: "0.875rem", fontWeight: 500, color: "#374151" }}>From</label>
+            <input
+              type="date"
+              value={filters.dateFrom}
+              onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
+              style={{ width: "100%", padding: "0.5rem", border: "1px solid #ddd", borderRadius: "0.375rem", boxSizing: "border-box" }}
+            />
+          </div>
+          <div>
+            <label style={{ display: "block", marginBottom: "0.25rem", fontSize: "0.875rem", fontWeight: 500, color: "#374151" }}>To</label>
+            <input
+              type="date"
+              value={filters.dateTo}
+              onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
+              style={{ width: "100%", padding: "0.5rem", border: "1px solid #ddd", borderRadius: "0.375rem", boxSizing: "border-box" }}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => setFilters({ venueId: "", status: "", dateFrom: "", dateTo: "" })}
+            disabled={!hasActiveFilters}
+            style={{
+              background: hasActiveFilters ? "#6b7280" : "#e5e7eb",
+              color: hasActiveFilters ? "white" : "#9ca3af",
+              padding: "0.5rem 1rem",
+              borderRadius: "0.375rem",
+              border: "none",
+              cursor: hasActiveFilters ? "pointer" : "not-allowed",
+              height: "fit-content",
+            }}
+          >
+            Clear
+          </button>
+        </div>
+
         {/* Events List */}
         {eventsQuery.isLoading && <p>Loading events...</p>}
         {eventsQuery.error && <p style={{ color: "#ef4444" }}>Error loading events</p>}
-        {(eventsQuery.data || []).length === 0 && <p style={{ color: "#999" }}>No events yet. Create one to get started!</p>}
+        {(eventsQuery.data || []).length === 0 && !eventsQuery.isLoading && (
+          <p style={{ color: "#999" }}>
+            {hasActiveFilters ? "No events match the current filters." : "No events yet. Create one to get started!"}
+          </p>
+        )}
         {(eventsQuery.data || []).length > 0 && (
           <div style={{ display: "grid", gap: "1rem" }}>
             {eventsQuery.data?.map((event) => (

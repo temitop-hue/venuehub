@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { db, events } from "@venuehub/db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, gte, lte } from "drizzle-orm";
 
 const eventInput = z.object({
   venueId: z.number(),
@@ -19,12 +19,25 @@ const eventInput = z.object({
   advanceAmount: z.string().optional(),
 });
 
+const listFilters = z.object({
+  venueId: z.number().optional(),
+  status: z.enum(["pending", "confirmed", "completed", "cancelled"]).optional(),
+  dateFrom: z.string().optional(),
+  dateTo: z.string().optional(),
+}).optional();
+
 export const eventRouter = router({
-  list: protectedProcedure.query(async ({ ctx }) => {
-    return db.query.events.findMany({
-      where: (events, { eq }) => eq(events.tenantId, ctx.tenantId),
-    });
-  }),
+  list: protectedProcedure
+    .input(listFilters)
+    .query(async ({ ctx, input }) => {
+      const conditions = [eq(events.tenantId, ctx.tenantId)];
+      if (input?.venueId) conditions.push(eq(events.venueId, input.venueId));
+      if (input?.status) conditions.push(eq(events.status, input.status));
+      if (input?.dateFrom) conditions.push(gte(events.eventDate, new Date(input.dateFrom)));
+      if (input?.dateTo) conditions.push(lte(events.eventDate, new Date(input.dateTo)));
+
+      return db.select().from(events).where(and(...conditions));
+    }),
 
   get: protectedProcedure
     .input(z.object({ id: z.number() }))
