@@ -9,6 +9,7 @@ import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { CalendarPage } from "./pages/CalendarPage";
 import { LeadsPage } from "./pages/LeadsPage";
 import { SiteRoute } from "./public-site/SiteRoute";
+import { MarketingHome } from "./marketing/MarketingHome";
 import { useAuthStore } from "./store/auth";
 import { trpc } from "./trpc";
 import "./App.css";
@@ -34,7 +35,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={token ? <Navigate to="/dashboard" /> : <LoginPage />} />
+        <Route path="/" element={<MarketingHome />} />
+        <Route path="/login" element={token ? <Navigate to="/dashboard" /> : <LoginPage />} />
         <Route
           path="/dashboard"
           element={
