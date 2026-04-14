@@ -1,13 +1,9 @@
 import { create } from "zustand";
+import type { inferRouterOutputs } from "@trpc/server";
+import type { AppRouter } from "@venuehub/server";
 
-interface User {
-  id: number;
-  email: string;
-  firstName: string;
-  lastName: string;
-  tenantId: number;
-  role?: string;
-}
+type RouterOutputs = inferRouterOutputs<AppRouter>;
+export type User = RouterOutputs["auth"]["me"];
 
 interface AuthStore {
   token: string | null;

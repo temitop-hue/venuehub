@@ -16,7 +16,9 @@ export function createTrpcClient() {
     links: [
       httpBatchLink({
         url: `${import.meta.env.VITE_API_URL || "http://localhost:3001"}/trpc`,
-        credentials: "include",
+        fetch(url, options) {
+          return fetch(url, { ...options, credentials: "include" });
+        },
         async headers() {
           const token = localStorage.getItem("token");
           return token ? { Authorization: `Bearer ${token}` } : {};

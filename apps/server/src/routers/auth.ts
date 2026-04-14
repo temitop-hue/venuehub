@@ -19,100 +19,80 @@ const loginInput = z.object({
 
 export const authRouter = router({
   register: publicProcedure.input(signupInput).mutation(async ({ input }) => {
-    try {
-      // Check if email already exists
-      const existingUser = await db.query.users.findFirst({
-        where: (users, { eq }) => eq(users.email, input.email),
+    const existingUser = await db.query.users.findFirst({
+      where: (users, { eq }) => eq(users.email, input.email),
+    });
+
+    if (existingUser) {
+      throw new Error("Email already registered");
+    }
+
+    const tenantSlug = input.tenantName.toLowerCase().replace(/\s+/g, "-");
+    const tenantResult = await db
+      .insert(tenants)
+      .values({
+        name: input.tenantName,
+        slug: tenantSlug,
       });
 
-      if (existingUser) {
-        throw new Error("Email already registered");
-      }
+    const tenantId = (tenantResult as any).insertId || 1;
 
-      // Create tenant
-      const tenantSlug = input.tenantName.toLowerCase().replace(/\s+/g, "-");
-      const tenantResult = await db
-        .insert(tenants)
-        .values({
-          name: input.tenantName,
-          slug: tenantSlug,
-        });
+    const hashedPassword = await hashPassword(input.password);
+    const userResult = await db
+      .insert(users)
+      .values({
+        tenantId,
+        email: input.email,
+        password: hashedPassword,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        role: "admin",
+      });
 
-      // Get tenant ID from insert result
-      const tenantId = (tenantResult as any).insertId || 1;
+    const userId: number = (userResult as any).insertId;
 
-      // Create user
-      const hashedPassword = await hashPassword(input.password);
-      const userResult = await db
-        .insert(users)
-        .values({
-          tenantId,
-          email: input.email,
-          password: hashedPassword,
-          firstName: input.firstName,
-          lastName: input.lastName,
-          role: "admin", // First user is admin
-        });
+    const token = createJWT(userId, tenantId, input.email, "admin");
 
-      // Get user ID from insert result
-      const userId = (userResult as any).insertId;
-
-      // Create JWT
-      const token = createJWT(userId, tenantId, input.email, "admin");
-
-      return {
-        token,
-        user: {
-          id: userId,
-          email: input.email,
-          firstName: input.firstName,
-          lastName: input.lastName,
-          tenantId,
-        },
-      };
-    } catch (error: any) {
-      console.error("Registration error:", error);
-      throw new Error(error.message || "Registration failed");
-    }
+    return {
+      token,
+      user: {
+        id: userId,
+        email: input.email,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        tenantId,
+        role: "admin" as string,
+      },
+    };
   }),
 
   login: publicProcedure.input(loginInput).mutation(async ({ input }) => {
-    try {
-      // Find user
-      const foundUsers = await db.query.users.findMany({
-        where: (users, { eq }) => eq(users.email, input.email),
-      });
+    const user = await db.query.users.findFirst({
+      where: (users, { eq }) => eq(users.email, input.email),
+    });
 
-      if (foundUsers.length === 0) {
-        throw new Error("Invalid email or password");
-      }
-
-      const user = foundUsers[0];
-
-      // Verify password
-      const isPasswordValid = await verifyPassword(input.password, user.password);
-      if (!isPasswordValid) {
-        throw new Error("Invalid email or password");
-      }
-
-      // Create JWT
-      const token = createJWT(user.id, user.tenantId, user.email, user.role || "user");
-
-      return {
-        token,
-        user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          tenantId: user.tenantId,
-          role: user.role,
-        },
-      };
-    } catch (error: any) {
-      console.error("Login error:", error);
-      throw new Error(error.message || "Login failed");
+    if (!user) {
+      throw new Error("Invalid email or password");
     }
+
+    const isPasswordValid = await verifyPassword(input.password, user.password);
+    if (!isPasswordValid) {
+      throw new Error("Invalid email or password");
+    }
+
+    const token = createJWT(user.id, user.tenantId, user.email, user.role);
+
+    return {
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        tenantId: user.tenantId,
+        role: user.role,
+      },
+    };
   }),
 
   me: protectedProcedure.query(async ({ ctx }) => {
