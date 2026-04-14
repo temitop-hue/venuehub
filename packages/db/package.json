@@ -19,7 +19,7 @@
     "generate": "drizzle-kit generate:mysql"
   },
   "dependencies": {
-    "drizzle-orm": "^0.29.0",
+    "drizzle-orm": "^0.45.2",
     "mysql2": "^3.6.0"
   },
   "devDependencies": {
