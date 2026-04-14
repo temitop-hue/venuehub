@@ -1,8 +1,9 @@
 {
+  "$schema": "https://railway.com/railway.schema.json",
   "build": {
-    "command": "npm run build --workspace=@venuehub/web"
+    "buildCommand": "npm run build --workspace=@venuehub/web"
   },
   "deploy": {
-    "command": "npm run start --workspace=@venuehub/web"
+    "startCommand": "npm run start --workspace=@venuehub/web"
   }
 }
