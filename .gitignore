@@ -12,3 +12,11 @@ migrations/
 memory/
 *.tsbuildinfo
 .claude/
+
+# prevent stale tsc emit in web/server src/ from shadowing .tsx/.ts sources (Vite resolves .js first)
+apps/web/src/**/*.js
+apps/web/src/**/*.js.map
+apps/server/src/**/*.js
+apps/server/src/**/*.js.map
+packages/shared/src/**/*.js
+packages/shared/src/**/*.js.map
