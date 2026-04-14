@@ -1,6 +1,12 @@
 import React from "react";
 import { isKnownBlockType, parseBlockData } from "@venuehub/shared";
 import { HeroBlock } from "./blocks/HeroBlock";
+import { TextSection } from "./blocks/TextSection";
+import { GallerySection } from "./blocks/GallerySection";
+import { FeatureList } from "./blocks/FeatureList";
+import { PricingTable } from "./blocks/PricingTable";
+import { TestimonialSection } from "./blocks/TestimonialSection";
+import { CTASection } from "./blocks/CTASection";
 
 export function BlockRenderer({
   type,
@@ -20,6 +26,18 @@ export function BlockRenderer({
     switch (type) {
       case "HeroBlock":
         return <HeroBlock {...parseBlockData("HeroBlock", data)} />;
+      case "TextSection":
+        return <TextSection {...parseBlockData("TextSection", data)} />;
+      case "GallerySection":
+        return <GallerySection {...parseBlockData("GallerySection", data)} />;
+      case "FeatureList":
+        return <FeatureList {...parseBlockData("FeatureList", data)} />;
+      case "PricingTable":
+        return <PricingTable {...parseBlockData("PricingTable", data)} />;
+      case "TestimonialSection":
+        return <TestimonialSection {...parseBlockData("TestimonialSection", data)} />;
+      case "CTASection":
+        return <CTASection {...parseBlockData("CTASection", data)} />;
       default: {
         const _exhaustive: never = type;
         return _exhaustive;
