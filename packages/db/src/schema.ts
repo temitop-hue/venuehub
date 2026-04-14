@@ -95,8 +95,8 @@ export const staff = mysqlTable("staff", {
 
 
 export const leads = mysqlTable("leads", {
-  id: varchar("id", { length: 191 }).primaryKey(),
-  tenantId: varchar("tenant_id", { length: 191 }).notNull(),
+  id: int("id").primaryKey().autoincrement(),
+  tenantId: int("tenant_id").notNull().references(() => tenants.id),
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }),
   phone: varchar("phone", { length: 50 }),
@@ -111,34 +111,34 @@ export const leads = mysqlTable("leads", {
     "negotiating",
     "booked",
     "lost",
-  ]).default("new"),
+  ]).default("new").notNull(),
   source: varchar("source", { length: 100 }),
   notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").onUpdateNow(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
 // Payments
 export const payments = mysqlTable("payments", {
-  id: varchar("id", { length: 191 }).primaryKey(),
-  tenantId: varchar("tenant_id", { length: 191 }).notNull(),
-  eventId: varchar("event_id", { length: 191 }),
+  id: int("id").primaryKey().autoincrement(),
+  tenantId: int("tenant_id").notNull().references(() => tenants.id),
+  eventId: int("event_id").references(() => events.id),
   amount: int("amount").notNull(),
   status: mysqlEnum("status", [
     "pending",
     "paid",
     "failed",
     "refunded",
-  ]).default("pending"),
+  ]).default("pending").notNull(),
   stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 255 }),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 // Invoices
 export const invoices = mysqlTable("invoices", {
-  id: varchar("id", { length: 191 }).primaryKey(),
-  tenantId: varchar("tenant_id", { length: 191 }).notNull(),
-  eventId: varchar("event_id", { length: 191 }),
+  id: int("id").primaryKey().autoincrement(),
+  tenantId: int("tenant_id").notNull().references(() => tenants.id),
+  eventId: int("event_id").references(() => events.id),
   total: int("total").notNull(),
   dueDate: timestamp("due_date"),
   status: mysqlEnum("status", [
@@ -146,15 +146,15 @@ export const invoices = mysqlTable("invoices", {
     "sent",
     "paid",
     "overdue",
-  ]).default("draft"),
+  ]).default("draft").notNull(),
   pdfUrl: varchar("pdf_url", { length: 500 }),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 // Guests
 export const guests = mysqlTable("guests", {
-  id: varchar("id", { length: 191 }).primaryKey(),
-  eventId: varchar("event_id", { length: 191 }).notNull(),
+  id: int("id").primaryKey().autoincrement(),
+  eventId: int("event_id").notNull().references(() => events.id),
   name: varchar("name", { length: 255 }),
   email: varchar("email", { length: 255 }),
   phone: varchar("phone", { length: 50 }),
@@ -163,18 +163,18 @@ export const guests = mysqlTable("guests", {
     "invited",
     "confirmed",
     "checked_in",
-  ]).default("invited"),
-  createdAt: timestamp("created_at").defaultNow(),
+  ]).default("invited").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 // Audit Logs (optional)
 export const auditLogs = mysqlTable("audit_logs", {
-  id: varchar("id", { length: 191 }).primaryKey(),
-  tenantId: varchar("tenant_id", { length: 191 }),
-  userId: varchar("user_id", { length: 191 }),
+  id: int("id").primaryKey().autoincrement(),
+  tenantId: int("tenant_id").references(() => tenants.id),
+  userId: int("user_id").references(() => users.id),
   action: varchar("action", { length: 255 }),
   entity: varchar("entity", { length: 100 }),
-  entityId: varchar("entity_id", { length: 191 }),
+  entityId: int("entity_id"),
   metadata: text("metadata"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });

@@ -18,10 +18,11 @@ export const leadsRouter = router({
       notes: z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
+      const { eventDate, ...rest } = input;
       return db.insert(schema.leads).values({
-        id: crypto.randomUUID(),
         tenantId: ctx.tenantId,
-        ...input,
+        ...rest,
+        eventDate: eventDate ? new Date(eventDate) : undefined,
       });
     }),
 
@@ -34,7 +35,7 @@ export const leadsRouter = router({
 
   updateStatus: protectedProcedure
     .input(z.object({
-      id: z.string(),
+      id: z.number(),
       status: z.enum([
         "new",
         "contacted",
