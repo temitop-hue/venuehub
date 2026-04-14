@@ -1,67 +1,16 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { trpc } from "../trpc";
-import { useAuthStore } from "../store/auth";
 
 export function AnalyticsPage() {
-  const { user, logout } = useAuthStore();
-  const navigate = useNavigate();
-
   const summaryQuery = trpc.analytics.summary.useQuery();
   const revenueByVenueQuery = trpc.analytics.revenueByVenue.useQuery();
   const eventTrendsQuery = trpc.analytics.eventTrends.useQuery();
   const statusBreakdownQuery = trpc.analytics.statusBreakdown.useQuery();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
-
   const summary = summaryQuery.data;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f5f5f5" }}>
-      <header style={{ background: "white", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", padding: "1rem" }}>
-        <div style={{ maxWidth: "80rem", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <h1 style={{ fontSize: "1.875rem", fontWeight: "bold", color: "#2563eb" }}>VenueHub</h1>
-          <nav style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
-            <button onClick={() => navigate("/dashboard")} style={{ background: "transparent", border: "none", cursor: "pointer", color: "#666", fontWeight: "500" }}>
-              Dashboard
-            </button>
-            <button onClick={() => navigate("/venues")} style={{ background: "transparent", border: "none", cursor: "pointer", color: "#666", fontWeight: "500" }}>
-              Venues
-            </button>
-            <button onClick={() => navigate("/events")} style={{ background: "transparent", border: "none", cursor: "pointer", color: "#666", fontWeight: "500" }}>
-              Events
-            </button>
-            <button onClick={() => navigate("/staff")} style={{ background: "transparent", border: "none", cursor: "pointer", color: "#666", fontWeight: "500" }}>
-              Staff
-            </button>
-            <button
-              onClick={() => navigate("/analytics")}
-              style={{
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                color: "#2563eb",
-                fontWeight: "500",
-              }}
-            >
-              Analytics
-            </button>
-            <div style={{ display: "flex", gap: "1rem", alignItems: "center", borderLeft: "1px solid #ddd", paddingLeft: "1rem" }}>
-              <span style={{ color: "#666" }}>
-                {user?.firstName} {user?.lastName}
-              </span>
-              <button onClick={handleLogout} style={{ background: "#ef4444", color: "white", padding: "0.5rem 1rem", borderRadius: "0.375rem", border: "none", cursor: "pointer" }}>
-                Logout
-              </button>
-            </div>
-          </nav>
-        </div>
-      </header>
-
-      <main style={{ maxWidth: "80rem", margin: "0 auto", padding: "2rem 1rem" }}>
+    <div>
         <h2 style={{ fontSize: "1.5rem", fontWeight: "bold", marginBottom: "2rem" }}>Analytics & Reports</h2>
 
         {summaryQuery.isLoading ? (
@@ -152,7 +101,6 @@ export function AnalyticsPage() {
             )}
           </>
         )}
-      </main>
     </div>
   );
 }

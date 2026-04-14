@@ -1,11 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { trpc } from "../trpc";
-import { useAuthStore } from "../store/auth";
 
 export function VenuesPage() {
-  const { user, logout } = useAuthStore();
-  const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
@@ -112,52 +108,8 @@ export function VenuesPage() {
     setShowForm(true);
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
-
   return (
-    <div style={{ minHeight: "100vh", background: "#f5f5f5" }}>
-      {/* Header */}
-      <header style={{ background: "white", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", padding: "1rem" }}>
-        <div style={{ maxWidth: "80rem", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <h1 style={{ fontSize: "1.875rem", fontWeight: "bold", color: "#2563eb" }}>VenueHub</h1>
-          <nav style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
-            <button onClick={() => navigate("/dashboard")} style={{ background: "transparent", border: "none", cursor: "pointer", color: "#666", fontWeight: "500" }}>
-              Dashboard
-            </button>
-            <button
-              onClick={() => navigate("/venues")}
-              style={{
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                color: "#2563eb",
-                fontWeight: "500",
-              }}
-            >
-              Venues
-            </button>
-            <button onClick={() => navigate("/events")} style={{ background: "transparent", border: "none", cursor: "pointer", color: "#666", fontWeight: "500" }}>
-              Events
-            </button>
-            <button onClick={() => navigate("/staff")} style={{ background: "transparent", border: "none", cursor: "pointer", color: "#666", fontWeight: "500" }}>
-              Staff
-            </button>
-            <div style={{ display: "flex", gap: "1rem", alignItems: "center", borderLeft: "1px solid #ddd", paddingLeft: "1rem" }}>
-              <span style={{ color: "#666" }}>
-                {user?.firstName} {user?.lastName}
-              </span>
-              <button onClick={handleLogout} style={{ background: "#ef4444", color: "white", padding: "0.5rem 1rem", borderRadius: "0.375rem", border: "none", cursor: "pointer" }}>
-                Logout
-              </button>
-            </div>
-          </nav>
-        </div>
-      </header>
-
-      <main style={{ maxWidth: "80rem", margin: "0 auto", padding: "2rem 1rem" }}>
+    <div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
           <h2 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>Venues</h2>
           <button
@@ -439,7 +391,6 @@ export function VenuesPage() {
             ))}
           </div>
         )}
-      </main>
     </div>
   );
 }

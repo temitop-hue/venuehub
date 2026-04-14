@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { trpc } from "../trpc";
-import { useAuthStore } from "../store/auth";
 
 interface DayEvent {
   id: number;
@@ -11,7 +10,6 @@ interface DayEvent {
 }
 
 export function CalendarPage() {
-  const { user, logout } = useAuthStore();
   const [currentDate, setCurrentDate] = useState(new Date(2024, 0, 1)); // January 2024
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showEventForm, setShowEventForm] = useState(false);
@@ -130,40 +128,7 @@ export function CalendarPage() {
   };
 
   return (
-    <div style={{ margin: 0, padding: 0, minHeight: "100vh", backgroundColor: "#f5f5f5" }}>
-      {/* Header */}
-      <div style={{ backgroundColor: "#1f2937", color: "white", padding: "16px 24px" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <h1 style={{ margin: 0, fontSize: "24px", fontWeight: "bold" }}>VenueHub</h1>
-          <div style={{ display: "flex", gap: "24px", alignItems: "center" }}>
-            <a href="/dashboard" style={{ color: "white", textDecoration: "none" }}>Dashboard</a>
-            <a href="/venues" style={{ color: "white", textDecoration: "none" }}>Venues</a>
-            <a href="/events" style={{ color: "white", textDecoration: "none" }}>Events</a>
-            <a href="/analytics" style={{ color: "white", textDecoration: "none" }}>Analytics</a>
-            <a href="/calendar" style={{ color: "white", textDecoration: "none", fontWeight: "bold", borderBottom: "2px solid white", paddingBottom: "4px" }}>Calendar</a>
-            <a href="/staff" style={{ color: "white", textDecoration: "none" }}>Staff</a>
-            <span style={{ color: "#d1d5db" }}>|</span>
-            <span style={{ fontSize: "14px" }}>{user?.email}</span>
-            <button
-              onClick={logout}
-              style={{
-                backgroundColor: "#ef4444",
-                color: "white",
-                border: "none",
-                padding: "8px 16px",
-                borderRadius: "4px",
-                cursor: "pointer",
-                fontSize: "14px",
-              }}
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div style={{ maxWidth: "1200px", margin: "24px auto", padding: "0 24px" }}>
+    <div>
         <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "24px" }}>
           {/* Calendar */}
           <div style={{ backgroundColor: "white", borderRadius: "8px", padding: "24px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
@@ -514,7 +479,6 @@ export function CalendarPage() {
             )}
           </div>
         </div>
-      </div>
     </div>
   );
 }
