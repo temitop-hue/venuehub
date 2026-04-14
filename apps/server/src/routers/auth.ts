@@ -28,17 +28,17 @@ export const authRouter = router({
     }
 
     const tenantSlug = input.tenantName.toLowerCase().replace(/\s+/g, "-");
-    const tenantResult = await db
+    const [tenantHeader] = await db
       .insert(tenants)
       .values({
         name: input.tenantName,
         slug: tenantSlug,
       });
 
-    const tenantId = (tenantResult as any).insertId || 1;
+    const tenantId = tenantHeader.insertId;
 
     const hashedPassword = await hashPassword(input.password);
-    const userResult = await db
+    const [userHeader] = await db
       .insert(users)
       .values({
         tenantId,
@@ -49,7 +49,7 @@ export const authRouter = router({
         role: "admin",
       });
 
-    const userId: number = (userResult as any).insertId;
+    const userId = userHeader.insertId;
 
     const token = createJWT(userId, tenantId, input.email, "admin");
 

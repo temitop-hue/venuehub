@@ -36,7 +36,7 @@ export const staffRouter = router({
   create: protectedProcedure
     .input(staffInput)
     .mutation(async ({ ctx, input }) => {
-      const result = await db
+      const [result] = await db
         .insert(staff)
         .values({
           tenantId: ctx.tenantId,
@@ -47,7 +47,7 @@ export const staffRouter = router({
           department: input.department,
         });
 
-      return { id: (result as any).insertId, ...input };
+      return { id: result.insertId, ...input };
     }),
 
   update: protectedProcedure

@@ -41,7 +41,7 @@ export const venueRouter = router({
   create: protectedProcedure
     .input(venueInput)
     .mutation(async ({ ctx, input }) => {
-      const result = await db
+      const [result] = await db
         .insert(venues)
         .values({
           tenantId: ctx.tenantId!,
@@ -57,7 +57,7 @@ export const venueRouter = router({
           rentPrice: input.rentPrice ? parseFloat(input.rentPrice).toString() : null,
         });
 
-      return { id: (result as any).insertId, ...input };
+      return { id: result.insertId, ...input };
     }),
 
   update: protectedProcedure

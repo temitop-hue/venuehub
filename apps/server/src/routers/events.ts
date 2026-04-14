@@ -57,7 +57,7 @@ export const eventRouter = router({
   create: protectedProcedure
     .input(eventInput)
     .mutation(async ({ ctx, input }) => {
-      const result = await db
+      const [result] = await db
         .insert(events)
         .values({
           tenantId: ctx.tenantId!,
@@ -76,7 +76,7 @@ export const eventRouter = router({
           advanceAmount: input.advanceAmount ? parseFloat(input.advanceAmount).toString() : null,
         });
 
-      return { id: (result as any).insertId, ...input };
+      return { id: result.insertId, ...input };
     }),
 
   update: protectedProcedure

@@ -7,14 +7,14 @@ export const tenantRouter = router({
   create: publicProcedure
     .input(z.object({ name: z.string().min(1) }))
     .mutation(async ({ input }) => {
-      const result = await db
+      const [result] = await db
         .insert(tenants)
         .values({
           name: input.name,
           slug: input.name.toLowerCase().replace(/\s+/g, "-"),
         });
 
-      return { id: (result as any).insertId, name: input.name };
+      return { id: result.insertId, name: input.name };
     }),
 
   get: protectedProcedure.query(async ({ ctx }) => {
