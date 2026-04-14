@@ -25,6 +25,7 @@ import { analyticsRouter } from "./routers/analytics";
 import { leadsRouter } from "./routers/leads";
 import { publicSiteRouter } from "./routers/publicSite";
 import { onboardingRouter } from "./routers/onboarding";
+import { siteAdminRouter } from "./routers/siteAdmin";
 
 const app = express();
 
@@ -65,6 +66,7 @@ const appRouter = router({
   leads: leadsRouter,
   publicSite: publicSiteRouter,
   onboarding: onboardingRouter,
+  siteAdmin: siteAdminRouter,
 });
 
 // tRPC handler

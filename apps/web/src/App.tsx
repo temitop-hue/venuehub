@@ -10,7 +10,7 @@ import { CalendarPage } from "./pages/CalendarPage";
 import { LeadsPage } from "./pages/LeadsPage";
 import { PaymentsPage } from "./pages/PaymentsPage";
 import { GuestsPage } from "./pages/GuestsPage";
-import { SiteBuilderPage } from "./pages/SiteBuilderPage";
+import { SiteBuilder } from "./site-builder/SiteBuilder";
 import { SettingsPage } from "./pages/SettingsPage";
 import { SiteRoute } from "./public-site/SiteRoute";
 import { MarketingHome } from "./marketing/MarketingHome";
@@ -62,7 +62,7 @@ function App() {
         <Route path="/calendar" element={<AppRoute><CalendarPage /></AppRoute>} />
         <Route path="/payments" element={<AppRoute><PaymentsPage /></AppRoute>} />
         <Route path="/guests" element={<AppRoute><GuestsPage /></AppRoute>} />
-        <Route path="/site" element={<AppRoute><SiteBuilderPage /></AppRoute>} />
+        <Route path="/site" element={<AppRoute><SiteBuilder /></AppRoute>} />
         <Route path="/venues" element={<AppRoute><VenuesPage /></AppRoute>} />
         <Route path="/staff" element={<AppRoute><StaffPage /></AppRoute>} />
         <Route path="/analytics" element={<AppRoute><AnalyticsPage /></AppRoute>} />
