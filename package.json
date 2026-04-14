@@ -1,0 +1,29 @@
+{
+  "name": "venuehub-monorepo",
+  "version": "1.0.0",
+  "description": "Multi-tenant SaaS venue management platform",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run -w @venuehub/web dev",
+    "dev:server": "npm run -w @venuehub/server dev",
+    "dev": "npm run dev:server",
+    "build": "npm run -w @venuehub/web build && npm run -w @venuehub/server build",
+    "db:migrate": "npm run -w @venuehub/db migrate",
+    "db:push": "npm run -w @venuehub/db push",
+    "db:studio": "npm run -w @venuehub/db studio",
+    "db:generate": "npm run -w @venuehub/db generate",
+    "lint": "npm run -w @venuehub/web lint && npm run -w @venuehub/server lint",
+    "type-check": "npm run -w @venuehub/web type-check && npm run -w @venuehub/server type-check"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1"
+  }
+}

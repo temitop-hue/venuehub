@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VenueHub - Product Requirements Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #1f2937;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #6b7280;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+        
+        .meta {
+            color: #9ca3af;
+            font-size: 0.95em;
+            margin-top: 10px;
+        }
+        
+        h2 {
+            color: #1f2937;
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            border-left: 4px solid #2563eb;
+            padding-left: 15px;
+        }
+        
+        h3 {
+            color: #374151;
+            font-size: 1.4em;
+            margin-top: 25px;
+            margin-bottom: 12px;
+        }
+        
+        h4 {
+            color: #4b5563;
+            font-size: 1.2em;
+            margin-top: 18px;
+            margin-bottom: 10px;
+        }
+        
+        p {
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+        
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .feature-box {
+            background: #f0f9ff;
+            border-left: 4px solid #0ea5e9;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .info-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .success-box {
+            background: #dcfce7;
+            border-left: 4px solid #22c55e;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+        
+        th {
+            background: #2563eb;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        tr:nth-child(even) {
+            background: #f9fafb;
+        }
+        
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+        }
+        
+        pre {
+            background: #1f2937;
+            color: #f3f4f6;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .badge-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-info {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+        
+        .page-break {
+            page-break-after: always;
+            margin: 40px 0;
+            border-bottom: 2px dashed #d1d5db;
+            padding-bottom: 20px;
+        }
+        
+        .toc {
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 30px 0;
+        }
+        
+        .toc h3 {
+            margin-top: 0;
+            color: #1f2937;
+        }
+        
+        .toc ol {
+            margin-left: 20px;
+        }
+        
+        .toc li {
+            margin-bottom: 6px;
+        }
+        
+        strong {
+            color: #1f2937;
+            font-weight: 600;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                max-width: 100%;
+                box-shadow: none;
+                padding: 0;
+            }
+            
+            h2 {
+                page-break-after: avoid;
+            }
+            
+            h3 {
+                page-break-after: avoid;
+            }
+            
+            table {
+                page-break-inside: avoid;
+            }
+            
+            .page-break {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>VenueHub</h1>
+            <p class="subtitle">Multi-Tenant SaaS Venue Management Platform</p>
+            <p class="subtitle">Product Requirements Document</p>
+            <div class="meta">
+                <p><strong>Version:</strong> 1.0 | <strong>Date:</strong> April 13, 2026 | <strong>Status:</strong> In Development</p>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <h2>1. Executive Summary</h2>
+        <p>VenueHub is a comprehensive, multi-tenant SaaS platform designed to help banquet halls, event venues, and wedding venues streamline their operations. It provides complete end-to-end management of venues, events/bookings, staff, and revenue tracking with advanced analytics, calendar views, and reporting capabilities.</p>
+        
+        <h3>Key Value Propositions:</h3>
+        <ul>
+            <li>Centralized venue and booking management</li>
+            <li>Multi-tenant architecture with complete data isolation</li>
+            <li>Real-time revenue analytics and reporting</li>
+            <li>Intuitive calendar-based event scheduling</li>
+            <li>Role-based access control for team collaboration</li>
+            <li>Built for scale with modern cloud-ready architecture</li>
+        </ul>
+
+        <!-- Vision & Goals -->
+        <h2>2. Vision & Goals</h2>
+        
+        <h3>Vision</h3>
+        <p>To become the leading all-in-one management platform for event venues, enabling venue owners and managers to focus on delivering exceptional experiences while automating administrative tasks.</p>
+        
+        <h3>Goals</h3>
+        <ol>
+            <li><strong>Goal 1:</strong> Enable venues to manage bookings efficiently with 80% reduction in manual work</li>
+            <li><strong>Goal 2:</strong> Provide actionable analytics for revenue optimization and business decisions</li>
+            <li><strong>Goal 3:</strong> Support team collaboration with role-based permissions and multi-user access</li>
+            <li><strong>Goal 4:</strong> Scale to thousands of venues with secure, isolated multi-tenant architecture</li>
+            <li><strong>Goal 5:</strong> Deliver a mobile-friendly, intuitive user interface</li>
+        </ol>
+
+        <!-- Target Users -->
+        <h2>3. Target Users</h2>
+        
+        <h3>3.1 Venue Managers</h3>
+        <div class="card">
+            <p><strong>Profile:</strong> Manages day-to-day venue operations</p>
+            <p><strong>Responsibilities:</strong> Booking management, event scheduling, staff assignment</p>
+            <p><strong>Needs:</strong> Quick event lookup, status tracking, easiest-to-use interface</p>
+        </div>
+        
+        <h3>3.2 Venue Owners</h3>
+        <div class="card">
+            <p><strong>Profile:</strong> Business owner/decision maker</p>
+            <p><strong>Responsibilities:</strong> Revenue tracking, policy setting, performance monitoring</p>
+            <p><strong>Needs:</strong> Analytics, revenue reports, KPI dashboards, admin controls</p>
+        </div>
+        
+        <h3>3.3 Sales/Booking Team</h3>
+        <div class="card">
+            <p><strong>Profile:</strong> Handles customer inquiries and bookings</p>
+            <p><strong>Responsibilities:</strong> Create events, follow up with clients, confirm bookings</p>
+            <p><strong>Needs:</strong> Quick event creation, client history, status management</p>
+        </div>
+        
+        <h3>3.4 Accounting/Finance Team</h3>
+        <div class="card">
+            <p><strong>Profile:</strong> Handles payments and financial reporting</p>
+            <p><strong>Responsibilities:</strong> Track advances, pending amounts, generate revenue reports</p>
+            <p><strong>Needs:</strong> Financial dashboards, export capabilities, payment tracking</p>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- Core Features -->
+        <h2>4. Core Features</h2>
+        
+        <h3>4.1 Authentication & Authorization</h3>
+        
+        <h4>4.1.1 User Registration</h4>
+        <ul>
+            <li>Email-based registration with unique tenant creation</li>
+            <li>Password hashing with bcrypt (salt rounds: 12)</li>
+            <li>JWT token generation with 7-day expiration</li>
+            <li>First registered user automatically assigned "admin" role</li>
+        </ul>
+        
+        <h4>4.1.2 User Login</h4>
+        <ul>
+            <li>Email and password authentication</li>
+            <li>JWT token generation with user role included</li>
+            <li>Persistent token storage in localStorage</li>
+            <li>Automatic session refresh on page load</li>
+        </ul>
+        
+        <h4>4.1.3 Session Management</h4>
+        <ul>
+            <li>Automatic role extraction from JWT</li>
+            <li>Bearer token validation on all protected routes</li>
+            <li>Logout functionality clearing stored tokens</li>
+            <li>Protected routes require valid authentication</li>
+        </ul>
+
+        <h3>4.2 Venue Management</h3>
+        <ul>
+            <li><strong>Create:</strong> Add new venues with capacity, pricing, and details</li>
+            <li><strong>List:</strong> View all venues with filtering and search</li>
+            <li><strong>Update:</strong> Edit venue information and settings</li>
+            <li><strong>Delete:</strong> Remove venues (soft/hard delete options)</li>
+        </ul>
+
+        <h3>4.3 Event/Booking Management</h3>
+        <ul>
+            <li><strong>Create:</strong> Book events with client details, dates, and amounts</li>
+            <li><strong>List:</strong> View all bookings with status and date information</li>
+            <li><strong>Update:</strong> Modify event details and status</li>
+            <li><strong>Delete:</strong> Cancel or remove events</li>
+        </ul>
+
+        <h3>4.4 Staff Management</h3>
+        <ul>
+            <li><strong>Add:</strong> Onboard staff members with roles and contact info</li>
+            <li><strong>List:</strong> View team members with departments and status</li>
+            <li><strong>Update:</strong> Modify staff information and assignments</li>
+            <li><strong>Delete:</strong> Remove staff members</li>
+        </ul>
+
+        <h3>4.5 Tenant Management</h3>
+        <ul>
+            <li><strong>Create:</strong> Organizations are auto-created on registration</li>
+            <li><strong>Get Info:</strong> Retrieve organization details</li>
+            <li><strong>Update:</strong> Modify organization name, logo, and settings</li>
+        </ul>
+
+        <div class="page-break"></div>
+
+        <!-- Advanced Features -->
+        <h2>5. Advanced Features</h2>
+        
+        <h3>5.1 Role-Based Access Control (RBAC)</h3>
+        
+        <h4>5.1.1 Role Definitions</h4>
+        <table>
+            <tr>
+                <th>Role</th>
+                <th>Description</th>
+                <th>Permissions</th>
+            </tr>
+            <tr>
+                <td><strong>Admin</strong></td>
+                <td>Full system access</td>
+                <td>Manage users, venues, events, staff, settings, analytics</td>
+            </tr>
+            <tr>
+                <td><strong>Manager</strong></td>
+                <td>Day-to-day operations</td>
+                <td>View/create/edit venues, events, staff</td>
+            </tr>
+            <tr>
+                <td><strong>Staff</strong></td>
+                <td>Limited access</td>
+                <td>View assigned events and basic info</td>
+            </tr>
+            <tr>
+                <td><strong>Guest</strong></td>
+                <td>Minimal access</td>
+                <td>Read-only access to specific events (future)</td>
+            </tr>
+        </table>
+
+        <h3>5.2 Analytics Dashboard</h3>
+        
+        <h4>5.2.1 Summary Metrics</h4>
+        <div class="feature-box">
+            <strong>Key Metrics Displayed:</strong>
+            <ul>
+                <li><strong>Total Revenue:</strong> Sum of all event totalAmount</li>
+                <li><strong>Advance Collected:</strong> Sum of all advanceAmount received</li>
+                <li><strong>Balance Pending:</strong> Total Revenue - Advance Collected</li>
+                <li><strong>Total Guest Count:</strong> Sum of all guestCount across events</li>
+                <li><strong>Event Status Breakdown:</strong> Counts for pending, confirmed, completed, cancelled</li>
+            </ul>
+        </div>
+        
+        <h4>5.2.2 Revenue by Venue</h4>
+        <p>Groups revenue and event count by venue to show which venues generate the most revenue and help with resource allocation decisions.</p>
+        
+        <h4>5.2.3 Event Trends</h4>
+        <p>Time-series data grouped by month showing seasonal patterns, growth trends, and revenue forecasting insights.</p>
+        
+        <h4>5.2.4 Status Breakdown</h4>
+        <p>Visual breakdown of event statuses to track booking pipeline health and identify bottlenecks.</p>
+
+        <h3>5.3 Calendar View</h3>
+        
+        <h4>5.3.1 Monthly Calendar</h4>
+        <ul>
+            <li>Interactive calendar grid showing all events for the month</li>
+            <li>Previous/Next month navigation</li>
+            <li>Current date highlighted (yellow)</li>
+            <li>Selected date highlighted (blue)</li>
+        </ul>
+        
+        <h4>5.3.2 Event Display</h4>
+        <ul>
+            <li>Events shown on respective dates</li>
+            <li>Event names displayed with truncation</li>
+            <li>"+" indicator when multiple events on same date</li>
+            <li>Status badges with color coding</li>
+        </ul>
+        
+        <h4>5.3.3 Quick Actions</h4>
+        <ul>
+            <li>Click date to see details and create events</li>
+            <li>Sidebar form for quick event creation</li>
+            <li>Event list for selected date</li>
+            <li>Status badges for quick identification</li>
+        </ul>
+
+        <div class="page-break"></div>
+
+        <!-- Technical Architecture -->
+        <h2>6. Technical Architecture</h2>
+        
+        <h3>6.1 Tech Stack</h3>
+        <table>
+            <tr>
+                <th>Layer</th>
+                <th>Technology</th>
+                <th>Version</th>
+            </tr>
+            <tr>
+                <td>Frontend</td>
+                <td>React</td>
+                <td>18.2+</td>
+            </tr>
+            <tr>
+                <td>Frontend Build</td>
+                <td>Vite</td>
+                <td>5.4+</td>
+            </tr>
+            <tr>
+                <td>Backend</td>
+                <td>Express</td>
+                <td>4.18+</td>
+            </tr>
+            <tr>
+                <td>API Layer</td>
+                <td>tRPC</td>
+                <td>10.28+</td>
+            </tr>
+            <tr>
+                <td>Database</td>
+                <td>MySQL</td>
+                <td>9.6+</td>
+            </tr>
+            <tr>
+                <td>ORM</td>
+                <td>Drizzle</td>
+                <td>0.29+</td>
+            </tr>
+            <tr>
+                <td>Validation</td>
+                <td>Zod</td>
+                <td>3.22+</td>
+            </tr>
+            <tr>
+                <td>Authentication</td>
+                <td>JWT + bcrypt</td>
+                <td>Latest</td>
+            </tr>
+        </table>
+
+        <h3>6.2 Database Schema</h3>
+        <div class="info-box">
+            <strong>Core Tables:</strong>
+            <ul>
+                <li><strong>tenants:</strong> Organizations with isolation boundaries</li>
+                <li><strong>users:</strong> User accounts with roles and authentication</li>
+                <li><strong>venues:</strong> Banquet halls and event spaces</li>
+                <li><strong>events:</strong> Bookings and reservations</li>
+                <li><strong>staff:</strong> Team members and designations</li>
+            </ul>
+        </div>
+
+        <h3>6.3 Multi-Tenant Isolation</h3>
+        <ul>
+            <li>Every query filtered by <code>tenantId</code></li>
+            <li>Foreign key constraints link all data to tenants</li>
+            <li>No cross-tenant data leakage at database level</li>
+            <li>JWT includes tenantId to prevent spoofing</li>
+            <li>All mutations validate tenantId matches context</li>
+        </ul>
+
+        <h3>6.4 Security Implementation</h3>
+        <div class="success-box">
+            <strong>Current Security Measures:</strong>
+            <ul>
+                <li>✅ JWT with 7-day expiration</li>
+                <li>✅ Password hashing with bcrypt (12 salt rounds)</li>
+                <li>✅ Bearer token in Authorization header</li>
+                <li>✅ Role-based access control</li>
+                <li>✅ Multi-tenant isolation</li>
+                <li>✅ Input validation with Zod schemas</li>
+                <li>✅ SQL injection prevention (ORM-based)</li>
+                <li>✅ CORS with whitelist (localhost:5173, 5174)</li>
+            </ul>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- Frontend Components -->
+        <h2>7. Frontend Components</h2>
+        
+        <h3>7.1 Page Components</h3>
+        <table>
+            <tr>
+                <th>Component</th>
+                <th>Route</th>
+                <th>Purpose</th>
+            </tr>
+            <tr>
+                <td>LoginPage</td>
+                <td>/</td>
+                <td>User login & registration</td>
+            </tr>
+            <tr>
+                <td>DashboardPage</td>
+                <td>/dashboard</td>
+                <td>Overview with quick stats</td>
+            </tr>
+            <tr>
+                <td>VenuesPage</td>
+                <td>/venues</td>
+                <td>CRUD for venues</td>
+            </tr>
+            <tr>
+                <td>EventsPage</td>
+                <td>/events</td>
+                <td>CRUD for bookings</td>
+            </tr>
+            <tr>
+                <td>StaffPage</td>
+                <td>/staff</td>
+                <td>CRUD for staff</td>
+            </tr>
+            <tr>
+                <td>AnalyticsPage</td>
+                <td>/analytics</td>
+                <td>Revenue dashboard</td>
+            </tr>
+            <tr>
+                <td>CalendarPage</td>
+                <td>/calendar</td>
+                <td>Event calendar</td>
+            </tr>
+        </table>
+
+        <h3>7.2 Common UI Patterns</h3>
+        <ul>
+            <li><strong>Forms:</strong> Input validation, error messages, submit/cancel buttons</li>
+            <li><strong>Tables:</strong> Sortable columns, pagination (future), edit/delete actions</li>
+            <li><strong>Modals:</strong> Create/edit forms, confirm dialogs</li>
+            <li><strong>Status Badges:</strong> Color-coded (green/yellow/blue/red)</li>
+            <li><strong>Metric Cards:</strong> Icon, value, label display</li>
+            <li><strong>Navigation:</strong> Persistent header with active route highlighting</li>
+        </ul>
+
+        <!-- Roadmap -->
+        <h2>8. Roadmap & Future Enhancements</h2>
+        
+        <h3>Phase 1 (Current - Q1 2026)</h3>
+        <div class="success-box">
+            <span class="badge badge-success">✅ COMPLETE</span>
+            <ul>
+                <li>Core CRUD operations (venues, events, staff)</li>
+                <li>User authentication with JWT</li>
+                <li>Role-based access control</li>
+                <li>Analytics dashboard</li>
+                <li>Interactive calendar view</li>
+                <li>Multi-tenant architecture</li>
+            </ul>
+        </div>
+        
+        <h3>Phase 2 (Q2 2026)</h3>
+        <div class="card">
+            <span class="badge badge-warning">🔲 PLANNED</span>
+            <ul>
+                <li>PDF/CSV report export</li>
+                <li>Email notification system</li>
+                <li>Advanced analytics with charts</li>
+                <li>Mobile app (React Native)</li>
+            </ul>
+        </div>
+        
+        <h3>Phase 3 (Q3 2026)</h3>
+        <div class="card">
+            <span class="badge badge-info">🔲 PLANNED</span>
+            <ul>
+                <li>Stripe payment integration</li>
+                <li>Invoice generation</li>
+                <li>Recurring event templates</li>
+                <li>Advanced reporting</li>
+            </ul>
+        </div>
+        
+        <h3>Phase 4+ (Q4 2026 - 2027)</h3>
+        <div class="card">
+            <span class="badge badge-info">🔲 PLANNED</span>
+            <ul>
+                <li>Team member roles (manager, staff)</li>
+                <li>Customer portal (self-service booking)</li>
+                <li>SMS notifications</li>
+                <li>Vendor marketplace</li>
+                <li>Multi-currency support</li>
+                <li>White-label SaaS</li>
+            </ul>
+        </div>
+
+        <!-- Success Metrics -->
+        <h2>9. Success Metrics & KPIs</h2>
+        
+        <h3>Business Metrics</h3>
+        <ul>
+            <li><strong>User Acquisition:</strong> Target 100 venues in year 1</li>
+            <li><strong>Retention:</strong> 80% monthly retention rate</li>
+            <li><strong>Revenue:</strong> Track ARPU (Average Revenue Per User)</li>
+            <li><strong>Churn:</strong> &lt;5% monthly churn</li>
+        </ul>
+        
+        <h3>Product Metrics</h3>
+        <ul>
+            <li><strong>Booking Creation Time:</strong> &lt;2 minutes from registration to first event</li>
+            <li><strong>Page Load Time:</strong> All pages &lt;2 seconds</li>
+            <li><strong>API Latency:</strong> &lt;500ms for 95th percentile</li>
+            <li><strong>Dashboard Load:</strong> Analytics page &lt;1 second</li>
+        </ul>
+        
+        <h3>Quality Metrics</h3>
+        <ul>
+            <li><strong>Uptime:</strong> 99.9% availability</li>
+            <li><strong>Error Rate:</strong> &lt;0.1% of requests with errors</li>
+            <li><strong>User Satisfaction:</strong> NPS score &gt;50</li>
+        </ul>
+
+        <div class="page-break"></div>
+
+        <!-- Deployment -->
+        <h2>10. Deployment & Scaling</h2>
+        
+        <h3>Development Environment</h3>
+        <ul>
+            <li><strong>Frontend:</strong> Vite dev server (localhost:5174)</li>
+            <li><strong>Backend:</strong> Node.js with tsx (localhost:3001)</li>
+            <li><strong>Database:</strong> Local MySQL (localhost:3306)</li>
+        </ul>
+        
+        <h3>Production Environment</h3>
+        <ul>
+            <li><strong>Frontend:</strong> Vite build → static hosting (Vercel/Netlify)</li>
+            <li><strong>Backend:</strong> Express → Docker container → Kubernetes/Railway.app</li>
+            <li><strong>Database:</strong> Managed MySQL (AWS RDS / PlanetScale)</li>
+            <li><strong>CDN:</strong> CloudFlare for static assets</li>
+        </ul>
+        
+        <h3>Scaling Strategy</h3>
+        <ul>
+            <li><strong>Horizontal:</strong> Load balancer → multiple Express instances</li>
+            <li><strong>Vertical:</strong> Database optimization, connection pooling</li>
+            <li><strong>Caching:</strong> Redis for session storage (future)</li>
+            <li><strong>Queue:</strong> Bull/RabbitMQ for async jobs (future)</li>
+        </ul>
+
+        <!-- Getting Started -->
+        <h2>11. Getting Started</h2>
+        
+        <h3>Local Environment Setup</h3>
+        <pre>
+# Clone repository
+git clone https://github.com/yourusername/venuehub.git
+cd venuehub
+
+# Install dependencies
+npm install
+
+# Setup environment variables
+cp .env.example .env.local
+
+# Database setup
+npm run db:push
+
+# Start servers
+npm run dev
+        </pre>
+
+        <h3>Project Structure</h3>
+        <pre>
+venuehub/
+├── apps/
+│   ├── server/          # Express backend
+│   │   └── src/
+│   │       ├── routers/  # tRPC route handlers
+│   │       ├── auth.ts   # JWT utilities
+│   │       └── index.ts  # Server entry
+│   └── web/             # React frontend
+│       └── src/
+│           ├── pages/    # Route components
+│           └── App.tsx   # Main router
+├── packages/
+│   ├── db/              # Drizzle schema
+│   └── shared/          # Shared types
+└── PRD.md               # This document
+        </pre>
+
+        <!-- Footer -->
+        <div style="margin-top: 60px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 0.9em;">
+            <p><strong>Document Version:</strong> 1.0</p>
+            <p><strong>Last Updated:</strong> April 13, 2026</p>
+            <p><strong>Status:</strong> APPROVED FOR DEVELOPMENT</p>
+            <p style="margin-top: 20px; font-style: italic;">For questions or updates, please contact the product team.</p>
+        </div>
+    </div>
+</body>
+</html>
