@@ -8,6 +8,7 @@ import { StaffPage } from "./pages/StaffPage";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { CalendarPage } from "./pages/CalendarPage";
 import { LeadsPage } from "./pages/LeadsPage";
+import { SiteRoute } from "./public-site/SiteRoute";
 import { useAuthStore } from "./store/auth";
 import { trpc } from "./trpc";
 import "./App.css";
@@ -90,6 +91,8 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route path="/v/:slug" element={<SiteRoute />} />
+        <Route path="/v/:slug/:pageSlug" element={<SiteRoute />} />
       </Routes>
     </Router>
   );

@@ -13,11 +13,12 @@ const getDatabaseConfig = () => {
     const url = new URL(dbUrl);
     const config = {
       host: url.hostname || "localhost",
-      user: url.username || "root",
-      password: url.password || "admin",
+      port: url.port ? parseInt(url.port) : 3306,
+      user: decodeURIComponent(url.username || "root"),
+      password: decodeURIComponent(url.password || "admin"),
       database: url.pathname?.slice(1) || "venuehub",
     };
-    console.log("Database config:", { host: config.host, user: config.user, database: config.database });
+    console.log("Database config:", { host: config.host, port: config.port, user: config.user, database: config.database });
     return config;
   } catch (error) {
     console.error("Failed to parse DATABASE_URL, using defaults:", error);
@@ -34,6 +35,7 @@ const config = getDatabaseConfig();
 
 const poolConnection = mysql.createPool({
   host: config.host,
+  port: (config as { port?: number }).port ?? 3306,
   user: config.user,
   password: config.password,
   database: config.database,

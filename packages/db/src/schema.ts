@@ -9,6 +9,8 @@ import {
   boolean,
   datetime,
   mysqlEnum,
+  json,
+  uniqueIndex,
 } from "drizzle-orm/mysql-core";
 
 // Tenants/Organizations
@@ -165,6 +167,99 @@ export const guests = mysqlTable("guests", {
     "checked_in",
   ]).default("invited").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// --- Site builder (public-facing tenant sites) ---
+
+export const tenantThemes = mysqlTable("tenant_themes", {
+  id: int("id").primaryKey().autoincrement(),
+  tenantId: int("tenant_id").notNull().unique().references(() => tenants.id),
+  tone: mysqlEnum("tone", ["luxury", "modern", "minimal", "classic", "corporate"]).default("luxury").notNull(),
+  primaryColor: varchar("primary_color", { length: 20 }).default("#0d0d0d").notNull(),
+  secondaryColor: varchar("secondary_color", { length: 20 }).default("#f7f3ea").notNull(),
+  accentColor: varchar("accent_color", { length: 20 }).default("#c9a86a").notNull(),
+  headingFont: varchar("heading_font", { length: 100 }).default("Playfair Display").notNull(),
+  bodyFont: varchar("body_font", { length: 100 }).default("Inter").notNull(),
+  logoUrl: varchar("logo_url", { length: 500 }),
+  heroOverlayOpacity: decimal("hero_overlay_opacity", { precision: 3, scale: 2 }).default("0.45").notNull(),
+  borderRadius: int("border_radius").default(2).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export const pages = mysqlTable("pages", {
+  id: int("id").primaryKey().autoincrement(),
+  tenantId: int("tenant_id").notNull().references(() => tenants.id),
+  slug: varchar("slug", { length: 100 }).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  metaTitle: varchar("meta_title", { length: 255 }),
+  metaDescription: text("meta_description"),
+  ogImage: varchar("og_image", { length: 500 }),
+  isPublished: boolean("is_published").default(false).notNull(),
+  hasDraft: boolean("has_draft").default(false).notNull(),
+  displayOrder: int("display_order").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+}, (t) => ({
+  tenantSlug: uniqueIndex("pages_tenant_slug_idx").on(t.tenantId, t.slug),
+}));
+
+export const blocks = mysqlTable("blocks", {
+  id: int("id").primaryKey().autoincrement(),
+  pageId: int("page_id").notNull().references(() => pages.id),
+  blockType: varchar("block_type", { length: 100 }).notNull(),
+  blockData: json("block_data").notNull(),
+  displayOrder: int("display_order").default(0).notNull(),
+  isVisible: boolean("is_visible").default(true).notNull(),
+  isPublished: boolean("is_published").default(false).notNull(),
+  isCurrentDraft: boolean("is_current_draft").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export const siteSettings = mysqlTable("site_settings", {
+  id: int("id").primaryKey().autoincrement(),
+  tenantId: int("tenant_id").notNull().unique().references(() => tenants.id),
+  businessName: varchar("business_name", { length: 255 }),
+  contactEmail: varchar("contact_email", { length: 320 }),
+  bookingEmail: varchar("booking_email", { length: 320 }),
+  phone: varchar("phone", { length: 20 }),
+  addressLine1: varchar("address_line1", { length: 255 }),
+  addressLine2: varchar("address_line2", { length: 255 }),
+  city: varchar("city", { length: 100 }),
+  state: varchar("state", { length: 100 }),
+  zip: varchar("zip", { length: 20 }),
+  country: varchar("country", { length: 100 }).default("US"),
+  timezone: varchar("timezone", { length: 50 }).default("America/New_York"),
+  currency: varchar("currency", { length: 10 }).default("USD"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export const navigation = mysqlTable("navigation", {
+  id: int("id").primaryKey().autoincrement(),
+  tenantId: int("tenant_id").notNull().references(() => tenants.id),
+  location: mysqlEnum("location", ["header", "footer"]).default("header").notNull(),
+  label: varchar("label", { length: 100 }).notNull(),
+  href: varchar("href", { length: 500 }).notNull(),
+  displayOrder: int("display_order").default(0).notNull(),
+  isVisible: boolean("is_visible").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export const media = mysqlTable("media", {
+  id: int("id").primaryKey().autoincrement(),
+  tenantId: int("tenant_id").notNull().references(() => tenants.id),
+  url: varchar("url", { length: 500 }).notNull(),
+  type: mysqlEnum("type", ["image", "video"]).default("image").notNull(),
+  alt: varchar("alt", { length: 500 }),
+  width: int("width"),
+  height: int("height"),
+  fileSize: int("file_size"),
+  mimeType: varchar("mime_type", { length: 100 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
 // Audit Logs (optional)

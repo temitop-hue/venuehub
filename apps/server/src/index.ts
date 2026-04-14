@@ -23,6 +23,7 @@ import { tenantRouter } from "./routers/tenants";
 import { staffRouter } from "./routers/staff";
 import { analyticsRouter } from "./routers/analytics";
 import { leadsRouter } from "./routers/leads";
+import { publicSiteRouter } from "./routers/publicSite";
 
 const app = express();
 
@@ -61,6 +62,7 @@ const appRouter = router({
   staff: staffRouter,
   analytics: analyticsRouter,
   leads: leadsRouter,
+  publicSite: publicSiteRouter,
 });
 
 // tRPC handler
