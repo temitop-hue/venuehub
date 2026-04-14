@@ -1,0 +1,8 @@
+{
+  "build": {
+    "command": "npm run build --workspace=@venuehub/web"
+  },
+  "deploy": {
+    "command": "npm run start --workspace=@venuehub/web"
+  }
+}
