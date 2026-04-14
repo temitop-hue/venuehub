@@ -18,6 +18,8 @@ export function CalendarPage() {
   const [formData, setFormData] = useState({
     eventName: "",
     venue: "",
+    clientName: "",
+    clientEmail: "",
     guestCount: "",
     totalAmount: "",
     advanceAmount: "",
@@ -52,9 +54,9 @@ export function CalendarPage() {
       })
       .map((e) => ({
         id: e.id,
-        eventName: e.eventName,
+        eventName: e.title,
         status: e.status,
-        venue: venues.find((v) => v.id === e.venueId)?.venueName || "Unknown",
+        venue: venues.find((v) => v.id === e.venueId)?.name || "Unknown",
       }));
   };
 
@@ -78,12 +80,14 @@ export function CalendarPage() {
 
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.eventName || !formData.venue || !selectedDate) return;
+    if (!formData.eventName || !formData.venue || !formData.clientName || !formData.clientEmail || !selectedDate) return;
 
     try {
       await createEventMutation.mutateAsync({
-        eventName: formData.eventName,
+        title: formData.eventName,
         venueId: parseInt(formData.venue),
+        clientName: formData.clientName,
+        clientEmail: formData.clientEmail,
         guestCount: parseInt(formData.guestCount) || 0,
         eventDate: formData.eventDate,
         totalAmount: (parseFloat(formData.totalAmount) || 0).toString(),
@@ -95,6 +99,8 @@ export function CalendarPage() {
       setFormData({
         eventName: "",
         venue: "",
+        clientName: "",
+        clientEmail: "",
         guestCount: "",
         totalAmount: "",
         advanceAmount: "",
@@ -355,10 +361,50 @@ export function CalendarPage() {
                         <option value="">Select venue</option>
                         {venues.map((v) => (
                           <option key={v.id} value={v.id}>
-                            {v.venueName}
+                            {v.name}
                           </option>
                         ))}
                       </select>
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", fontSize: "13px", fontWeight: "bold", marginBottom: "4px", color: "#374151" }}>
+                        Client Name
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.clientName}
+                        onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
+                        placeholder="Client name"
+                        style={{
+                          width: "100%",
+                          padding: "8px",
+                          border: "1px solid #d1d5db",
+                          borderRadius: "4px",
+                          fontSize: "14px",
+                          boxSizing: "border-box",
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: "block", fontSize: "13px", fontWeight: "bold", marginBottom: "4px", color: "#374151" }}>
+                        Client Email
+                      </label>
+                      <input
+                        type="email"
+                        value={formData.clientEmail}
+                        onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })}
+                        placeholder="client@example.com"
+                        style={{
+                          width: "100%",
+                          padding: "8px",
+                          border: "1px solid #d1d5db",
+                          borderRadius: "4px",
+                          fontSize: "14px",
+                          boxSizing: "border-box",
+                        }}
+                      />
                     </div>
 
                     <div>
