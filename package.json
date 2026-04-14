@@ -17,7 +17,8 @@
     "db:studio": "npm run -w @venuehub/db studio",
     "db:generate": "npm run -w @venuehub/db generate",
     "lint": "npm run -w @venuehub/web lint && npm run -w @venuehub/server lint",
-    "type-check": "npm run -w @venuehub/web type-check && npm run -w @venuehub/server type-check"
+    "type-check": "npm run -w @venuehub/web type-check && npm run -w @venuehub/server type-check",
+    "test": "npm run -w @venuehub/web test"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

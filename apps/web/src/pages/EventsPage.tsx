@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { trpc } from "../trpc";
 import { useAuthStore } from "../store/auth";
+import { toCsv, downloadCsv } from "../lib/csv";
 
 export function EventsPage() {
   const { user, logout } = useAuthStore();
@@ -196,6 +197,40 @@ export function EventsPage() {
       <main style={{ maxWidth: "80rem", margin: "0 auto", padding: "2rem 1rem" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
           <h2 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>Events & Bookings</h2>
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+          <button
+            onClick={() => {
+              const rows = eventsQuery.data || [];
+              if (rows.length === 0) return;
+              const csv = toCsv(rows, [
+                { key: "id", label: "ID" },
+                { key: "title", label: "Title" },
+                { key: "clientName", label: "Client" },
+                { key: "clientEmail", label: "Email" },
+                { key: "clientPhone", label: "Phone" },
+                { key: "eventDate", label: "Date" },
+                { key: "startTime", label: "Start" },
+                { key: "endTime", label: "End" },
+                { key: "guestCount", label: "Guests" },
+                { key: "status", label: "Status" },
+                { key: "totalAmount", label: "Total" },
+                { key: "advanceAmount", label: "Advance" },
+              ]);
+              downloadCsv(`events-${new Date().toISOString().split("T")[0]}.csv`, csv);
+            }}
+            disabled={(eventsQuery.data || []).length === 0}
+            style={{
+              background: "white",
+              color: "#2563eb",
+              padding: "0.5rem 1rem",
+              borderRadius: "0.375rem",
+              border: "1px solid #2563eb",
+              cursor: (eventsQuery.data || []).length === 0 ? "not-allowed" : "pointer",
+              opacity: (eventsQuery.data || []).length === 0 ? 0.5 : 1,
+            }}
+          >
+            Export CSV
+          </button>
           <button
             onClick={() => {
               setEditingId(null);
@@ -227,6 +262,7 @@ export function EventsPage() {
           >
             {showForm ? "Cancel" : "Add Event"}
           </button>
+          </div>
         </div>
 
         {/* Form */}

@@ -1,14 +1,22 @@
 import { z } from "zod";
-import { protectedProcedure, router } from "../trpc";
-import { db } from "@venuehub/db";
-import * as schema from "@venuehub/db";
-import { eq } from "drizzle-orm";
+import { protectedProcedure, managerProcedure, adminProcedure, router } from "../trpc";
+import { db, leads } from "@venuehub/db";
+import { eq, and } from "drizzle-orm";
+
+const leadStatus = z.enum([
+  "new",
+  "contacted",
+  "quoted",
+  "negotiating",
+  "booked",
+  "lost",
+]);
 
 export const leadsRouter = router({
-  create: protectedProcedure
+  create: managerProcedure
     .input(z.object({
-      name: z.string(),
-      email: z.string().optional(),
+      name: z.string().min(1),
+      email: z.string().email().optional(),
       phone: z.string().optional(),
       eventType: z.string().optional(),
       eventDate: z.string().optional(),
@@ -19,35 +27,39 @@ export const leadsRouter = router({
     }))
     .mutation(async ({ ctx, input }) => {
       const { eventDate, ...rest } = input;
-      return db.insert(schema.leads).values({
+      const [result] = await db.insert(leads).values({
         tenantId: ctx.tenantId,
         ...rest,
         eventDate: eventDate ? new Date(eventDate) : undefined,
       });
+      return { id: result.insertId };
     }),
 
-  list: protectedProcedure.query(async ({ ctx }) => {
-    return db.query.leads.findMany({
-      where: (l, { eq }) => eq(l.tenantId, ctx.tenantId),
-      orderBy: (l, { desc }) => desc(l.createdAt),
-    });
-  }),
+  list: protectedProcedure
+    .input(z.object({ status: leadStatus.optional() }).optional())
+    .query(async ({ ctx, input }) => {
+      const conditions = [eq(leads.tenantId, ctx.tenantId)];
+      if (input?.status) conditions.push(eq(leads.status, input.status));
+      return db.select().from(leads).where(and(...conditions)).orderBy(leads.createdAt);
+    }),
 
-  updateStatus: protectedProcedure
+  updateStatus: managerProcedure
     .input(z.object({
       id: z.number(),
-      status: z.enum([
-        "new",
-        "contacted",
-        "quoted",
-        "negotiating",
-        "booked",
-        "lost",
-      ]),
+      status: leadStatus,
     }))
     .mutation(async ({ ctx, input }) => {
-      return db.update(schema.leads)
+      await db.update(leads)
         .set({ status: input.status })
-        .where(eq(schema.leads.id, input.id));
+        .where(and(eq(leads.id, input.id), eq(leads.tenantId, ctx.tenantId)));
+      return { success: true };
+    }),
+
+  delete: adminProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      await db.delete(leads)
+        .where(and(eq(leads.id, input.id), eq(leads.tenantId, ctx.tenantId)));
+      return { success: true };
     }),
 });

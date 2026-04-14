@@ -7,6 +7,7 @@ import { EventsPage } from "./pages/EventsPage";
 import { StaffPage } from "./pages/StaffPage";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { CalendarPage } from "./pages/CalendarPage";
+import { LeadsPage } from "./pages/LeadsPage";
 import { useAuthStore } from "./store/auth";
 import { trpc } from "./trpc";
 import "./App.css";
@@ -78,6 +79,14 @@ function App() {
           element={
             <PrivateRoute>
               <CalendarPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/leads"
+          element={
+            <PrivateRoute>
+              <LeadsPage />
             </PrivateRoute>
           }
         />

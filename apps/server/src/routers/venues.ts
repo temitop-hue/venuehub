@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { protectedProcedure, router } from "../trpc";
+import { protectedProcedure, managerProcedure, adminProcedure, router } from "../trpc";
 import { db, venues } from "@venuehub/db";
 import { eq, and } from "drizzle-orm";
 
@@ -38,7 +38,7 @@ export const venueRouter = router({
       return venue;
     }),
 
-  create: protectedProcedure
+  create: managerProcedure
     .input(venueInput)
     .mutation(async ({ ctx, input }) => {
       const [result] = await db
@@ -60,7 +60,7 @@ export const venueRouter = router({
       return { id: result.insertId, ...input };
     }),
 
-  update: protectedProcedure
+  update: managerProcedure
     .input(z.object({ id: z.number(), ...venueInput.shape }))
     .mutation(async ({ ctx, input }) => {
       const { id, ...updateData } = input;
@@ -84,7 +84,7 @@ export const venueRouter = router({
       return { success: true };
     }),
 
-  delete: protectedProcedure
+  delete: adminProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
       await db
