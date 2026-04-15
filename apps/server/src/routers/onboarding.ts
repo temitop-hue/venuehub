@@ -152,13 +152,16 @@ export const onboardingRouter = router({
         });
       }
 
-      const sitePages = buildSitePages({
-        venueName: tenant.name,
-        city: input.city,
-        state: input.state,
-        primaryEventType: input.primaryEventType,
-        capacity: input.capacity,
-      });
+      const sitePages = buildSitePages(
+        {
+          venueName: tenant.name,
+          city: input.city,
+          state: input.state,
+          primaryEventType: input.primaryEventType,
+          capacity: input.capacity,
+        },
+        input.tone as Tone,
+      );
 
       const allExisting = await db
         .select({ id: pages.id })
