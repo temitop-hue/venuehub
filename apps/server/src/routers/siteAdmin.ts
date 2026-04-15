@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { asc, desc, eq, and, ne } from "drizzle-orm";
+import { asc, desc, eq, ne } from "drizzle-orm";
 import { managerProcedure, adminProcedure, router } from "../trpc";
 import { db, pages, blocks, tenantThemes } from "@venuehub/db";
 import { blockRegistry, isKnownBlockType } from "@venuehub/shared";
@@ -291,6 +291,13 @@ export const siteAdminRouter = router({
     }),
 
   // -------- THEME --------
+
+  getTheme: managerProcedure.query(async ({ ctx }) => {
+    const theme = await db.query.tenantThemes.findFirst({
+      where: (t, { eq }) => eq(t.tenantId, ctx.tenantId),
+    });
+    return theme ?? null;
+  }),
 
   updateTheme: managerProcedure
     .input(

@@ -4,18 +4,22 @@ import {
   Trash2,
   ArrowUp,
   ArrowDown,
+  ArrowLeft,
+  ArrowRight,
   Eye,
   EyeOff,
   ExternalLink,
   Save,
   Check,
   Settings,
+  Palette,
   X,
 } from "lucide-react";
 import { trpc } from "../trpc";
 import { useAuthStore } from "../store/auth";
 import { BLOCK_FIELDS, blockRegistry, type BlockType } from "@venuehub/shared";
 import { AutoForm, normalizeJsonFields } from "./AutoForm";
+import { ThemeModal } from "./ThemeModal";
 
 const colors = {
   bg: "#f6f6f2",
@@ -77,6 +81,7 @@ export function SiteBuilder() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showAddPage, setShowAddPage] = useState(false);
   const [showPageSettings, setShowPageSettings] = useState(false);
+  const [showTheme, setShowTheme] = useState(false);
 
   // Default to home page on first load
   useEffect(() => {
@@ -200,6 +205,23 @@ export function SiteBuilder() {
     },
   });
 
+  const reorderPagesMutation = trpc.siteAdmin.reorderPages.useMutation({
+    onSuccess: async () => {
+      await utils.siteAdmin.listPages.invalidate();
+      reloadPreview();
+    },
+  });
+
+  const movePage = (pageId: number, delta: -1 | 1) => {
+    const currentIndex = pageRows.findIndex((p) => p.id === pageId);
+    const targetIndex = currentIndex + delta;
+    if (currentIndex < 0 || targetIndex < 0 || targetIndex >= pageRows.length) return;
+    const next = pageRows.slice();
+    const [moved] = next.splice(currentIndex, 1);
+    next.splice(targetIndex, 0, moved);
+    reorderPagesMutation.mutate({ orderedIds: next.map((p) => p.id) });
+  };
+
   const handleSave = () => {
     if (!selectedBlock || !draft) return;
     const fields = BLOCK_FIELDS[selectedBlock.blockType] ?? [];
@@ -246,6 +268,7 @@ export function SiteBuilder() {
         }}
         onAddPage={() => setShowAddPage(true)}
         onPageSettings={() => setShowPageSettings(true)}
+        onOpenTheme={() => setShowTheme(true)}
       />
 
       <div
@@ -621,6 +644,10 @@ export function SiteBuilder() {
       {showPageSettings && currentPage && (
         <PageSettingsModal
           page={currentPage}
+          pageIndex={pageRows.findIndex((p) => p.id === currentPage.id)}
+          totalPages={pageRows.length}
+          onMoveLeft={() => movePage(currentPage.id, -1)}
+          onMoveRight={() => movePage(currentPage.id, 1)}
           onClose={() => setShowPageSettings(false)}
           onSave={(updates) => updatePageMutation.mutate({ pageId: currentPage.id, ...updates })}
           onDelete={() => {
@@ -633,6 +660,8 @@ export function SiteBuilder() {
           saveError={updatePageMutation.error?.message ?? null}
         />
       )}
+
+      {showTheme && <ThemeModal onClose={() => setShowTheme(false)} />}
     </div>
   );
 }
@@ -643,12 +672,14 @@ function PageTabStrip({
   onSelect,
   onAddPage,
   onPageSettings,
+  onOpenTheme,
 }: {
   pages: PageRow[];
   selectedPageId: number | null;
   onSelect: (id: number) => void;
   onAddPage: () => void;
   onPageSettings: () => void;
+  onOpenTheme: () => void;
 }) {
   return (
     <div
@@ -742,6 +773,28 @@ function PageTabStrip({
         }}
       >
         <Plus size={14} strokeWidth={2.25} /> New page
+      </button>
+      <div style={{ flex: 1 }} />
+      <button
+        onClick={onOpenTheme}
+        title="Theme & branding"
+        style={{
+          padding: "0.5rem 0.75rem",
+          background: "transparent",
+          border: `1px solid ${colors.border}`,
+          borderRadius: "4px",
+          margin: "0.375rem 0.25rem 0.375rem 0",
+          color: colors.text,
+          cursor: "pointer",
+          fontSize: "0.8125rem",
+          fontWeight: 500,
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "0.375rem",
+          whiteSpace: "nowrap",
+        }}
+      >
+        <Palette size={14} strokeWidth={2} /> Theme
       </button>
     </div>
   );
@@ -857,6 +910,10 @@ function AddPageModal({
 
 function PageSettingsModal({
   page,
+  pageIndex,
+  totalPages,
+  onMoveLeft,
+  onMoveRight,
   onClose,
   onSave,
   onDelete,
@@ -865,6 +922,10 @@ function PageSettingsModal({
   saveError,
 }: {
   page: PageRow;
+  pageIndex: number;
+  totalPages: number;
+  onMoveLeft: () => void;
+  onMoveRight: () => void;
   onClose: () => void;
   onSave: (updates: { title?: string; slug?: string; metaTitle?: string; metaDescription?: string; isPublished?: boolean }) => void;
   onDelete: () => void;
@@ -943,6 +1004,59 @@ function PageSettingsModal({
           />
           Published (appears in site navigation)
         </label>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            padding: "0.625rem 0.75rem",
+            background: colors.cardSubtle,
+            border: `1px solid ${colors.border}`,
+            borderRadius: "4px",
+            fontSize: "0.8125rem",
+          }}
+        >
+          <span style={{ color: colors.textMuted, flex: 1 }}>
+            Position in nav: <strong style={{ color: colors.text }}>{pageIndex + 1} of {totalPages}</strong>
+          </span>
+          <button
+            onClick={onMoveLeft}
+            disabled={pageIndex === 0}
+            style={{
+              padding: "0.25rem 0.5rem",
+              background: "white",
+              border: `1px solid ${colors.border}`,
+              borderRadius: "3px",
+              cursor: pageIndex === 0 ? "not-allowed" : "pointer",
+              color: pageIndex === 0 ? "#cfcfc8" : colors.text,
+              fontSize: "0.75rem",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.25rem",
+            }}
+          >
+            <ArrowLeft size={12} /> Move left
+          </button>
+          <button
+            onClick={onMoveRight}
+            disabled={pageIndex === totalPages - 1}
+            style={{
+              padding: "0.25rem 0.5rem",
+              background: "white",
+              border: `1px solid ${colors.border}`,
+              borderRadius: "3px",
+              cursor: pageIndex === totalPages - 1 ? "not-allowed" : "pointer",
+              color: pageIndex === totalPages - 1 ? "#cfcfc8" : colors.text,
+              fontSize: "0.75rem",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.25rem",
+            }}
+          >
+            Move right <ArrowRight size={12} />
+          </button>
+        </div>
         {saveError && (
           <div
             style={{
