@@ -8,6 +8,9 @@ import { PricingTable } from "./blocks/PricingTable";
 import { TestimonialSection } from "./blocks/TestimonialSection";
 import { CTASection } from "./blocks/CTASection";
 import { ContactFormBlock } from "./blocks/ContactFormBlock";
+import { FAQBlock } from "./blocks/FAQBlock";
+import { TourBookingBlock } from "./blocks/TourBookingBlock";
+import { AvailabilityBlock } from "./blocks/AvailabilityBlock";
 
 export function BlockRenderer({
   type,
@@ -41,6 +44,12 @@ export function BlockRenderer({
         return <CTASection {...parseBlockData("CTASection", data)} />;
       case "ContactFormBlock":
         return <ContactFormBlock {...parseBlockData("ContactFormBlock", data)} />;
+      case "FAQBlock":
+        return <FAQBlock {...parseBlockData("FAQBlock", data)} />;
+      case "TourBookingBlock":
+        return <TourBookingBlock {...parseBlockData("TourBookingBlock", data)} />;
+      case "AvailabilityBlock":
+        return <AvailabilityBlock {...parseBlockData("AvailabilityBlock", data)} />;
       default: {
         const _exhaustive: never = type;
         return _exhaustive;

@@ -26,6 +26,9 @@ import { leadsRouter } from "./routers/leads";
 import { publicSiteRouter } from "./routers/publicSite";
 import { onboardingRouter } from "./routers/onboarding";
 import { siteAdminRouter } from "./routers/siteAdmin";
+import { toursRouter } from "./routers/tours";
+import { availabilityRouter } from "./routers/availability";
+import { teamRouter } from "./routers/team";
 import { registerUploadRoutes } from "./uploads";
 
 const app = express();
@@ -68,6 +71,9 @@ const appRouter = router({
   publicSite: publicSiteRouter,
   onboarding: onboardingRouter,
   siteAdmin: siteAdminRouter,
+  tours: toursRouter,
+  availability: availabilityRouter,
+  team: teamRouter,
 });
 
 // File uploads (Railway volume mounted at /data/uploads)

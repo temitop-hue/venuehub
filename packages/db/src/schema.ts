@@ -263,6 +263,52 @@ export const media = mysqlTable("media", {
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
+// Tour bookings
+export const tourBookings = mysqlTable("tour_bookings", {
+  id: int("id").primaryKey().autoincrement(),
+  tenantId: int("tenant_id").notNull().references(() => tenants.id),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  phone: varchar("phone", { length: 50 }),
+  eventType: varchar("event_type", { length: 100 }),
+  guestCount: int("guest_count"),
+  tourDate: varchar("tour_date", { length: 10 }).notNull(), // YYYY-MM-DD
+  tourTime: varchar("tour_time", { length: 10 }).notNull(), // HH:mm
+  message: text("message"),
+  status: mysqlEnum("status", ["confirmed", "cancelled", "completed", "no_show"]).default("confirmed").notNull(),
+  cancelToken: varchar("cancel_token", { length: 64 }).notNull(),
+  reminderSent: boolean("reminder_sent").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+// Team invites
+export const invites = mysqlTable("invites", {
+  id: int("id").primaryKey().autoincrement(),
+  tenantId: int("tenant_id").notNull().references(() => tenants.id),
+  email: varchar("email", { length: 320 }).notNull(),
+  role: varchar("role", { length: 50 }).notNull(),
+  token: varchar("token", { length: 64 }).notNull().unique(),
+  invitedByUserId: int("invited_by_user_id").notNull().references(() => users.id),
+  expiresAt: timestamp("expires_at").notNull(),
+  acceptedAt: timestamp("accepted_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+// Blocked dates (admin-configured availability blocks)
+export const blockedDates = mysqlTable("blocked_dates", {
+  id: int("id").primaryKey().autoincrement(),
+  tenantId: int("tenant_id").notNull().references(() => tenants.id),
+  date: varchar("date", { length: 10 }).notNull(), // YYYY-MM-DD
+  reason: varchar("reason", { length: 255 }),
+  createdByUserId: int("created_by_user_id").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+}, (t) => ({
+  tenantDate: uniqueIndex("blocked_dates_tenant_date_idx").on(t.tenantId, t.date),
+}));
+
 // Audit Logs (optional)
 export const auditLogs = mysqlTable("audit_logs", {
   id: int("id").primaryKey().autoincrement(),

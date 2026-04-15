@@ -13,6 +13,8 @@ import {
   BarChart3,
   Settings,
   ExternalLink,
+  Compass,
+  UsersRound,
 } from "lucide-react";
 import { useAuthStore } from "../store/auth";
 
@@ -30,6 +32,7 @@ const sidebarColors = {
 const NAV_PRIMARY = [
   { to: "/dashboard", label: "Dashboard", Icon: LayoutDashboard },
   { to: "/leads", label: "Leads", Icon: Users },
+  { to: "/tours", label: "Tours", Icon: Compass },
   { to: "/events", label: "Bookings", Icon: CalendarCheck2 },
   { to: "/calendar", label: "Calendar", Icon: CalendarDays },
   { to: "/payments", label: "Payments", Icon: CreditCard },
@@ -44,7 +47,10 @@ const NAV_OPS = [
   { to: "/analytics", label: "Analytics", Icon: BarChart3 },
 ];
 
-const NAV_SYSTEM = [{ to: "/settings", label: "Settings", Icon: Settings }];
+const NAV_SYSTEM = [
+  { to: "/team", label: "Team", Icon: UsersRound },
+  { to: "/settings", label: "Settings", Icon: Settings },
+];
 
 export const SIDEBAR_WIDTH = 248;
 

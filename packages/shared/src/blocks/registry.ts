@@ -121,6 +121,45 @@ export const ctaSectionSchema = z.object({
 });
 export type CtaSectionData = z.infer<typeof ctaSectionSchema>;
 
+// ------- FAQBlock -------
+
+export const faqItemSchema = z.object({
+  question: z.string().min(1),
+  answer: z.string().min(1),
+  category: z.string().optional(),
+});
+export const faqBlockSchema = z.object({
+  eyebrow: z.string().optional(),
+  heading: z.string().default("Frequently Asked Questions"),
+  subheading: z.string().optional(),
+  faqs: z.array(faqItemSchema).min(1),
+});
+export type FAQBlockData = z.infer<typeof faqBlockSchema>;
+
+// ------- TourBookingBlock -------
+
+export const tourBookingBlockSchema = z.object({
+  eyebrow: z.string().optional(),
+  heading: z.string().default("Book a private tour"),
+  subheading: z.string().optional(),
+  introText: z.string().optional(),
+  availableDays: z.array(z.enum(["mon", "tue", "wed", "thu", "fri", "sat", "sun"]))
+    .default(["tue", "wed", "thu", "fri", "sat"]),
+  slotTimes: z.array(z.string()).default(["10:00", "14:00", "16:00"]),
+  successMessage: z.string().default("Your tour is confirmed. We'll be in touch shortly."),
+});
+export type TourBookingBlockData = z.infer<typeof tourBookingBlockSchema>;
+
+// ------- AvailabilityBlock -------
+
+export const availabilityBlockSchema = z.object({
+  eyebrow: z.string().optional(),
+  heading: z.string().default("Availability"),
+  subheading: z.string().optional(),
+  monthsAhead: z.number().int().min(1).max(12).default(3),
+});
+export type AvailabilityBlockData = z.infer<typeof availabilityBlockSchema>;
+
 // ------- ContactFormBlock -------
 
 export const contactFormBlockSchema = z.object({
@@ -204,6 +243,37 @@ export const blockRegistry = {
       alignment: "center",
       overlayOpacity: 0.55,
     } satisfies Partial<CtaSectionData>,
+  },
+  FAQBlock: {
+    label: "FAQs",
+    schema: faqBlockSchema,
+    defaults: {
+      heading: "Frequently Asked Questions",
+      faqs: [
+        { question: "How far in advance should we book?", answer: "We recommend booking 6–12 months in advance for weekend dates." },
+        { question: "Is catering included?", answer: "We work with a curated list of preferred caterers — pricing varies." },
+      ],
+    } satisfies Partial<FAQBlockData>,
+  },
+  TourBookingBlock: {
+    label: "Book a Tour",
+    schema: tourBookingBlockSchema,
+    defaults: {
+      heading: "Book a private tour",
+      subheading: "Walk the space with us. Tours take about 45 minutes.",
+      availableDays: ["tue", "wed", "thu", "fri", "sat"],
+      slotTimes: ["10:00", "14:00", "16:00"],
+      successMessage: "Your tour is confirmed. We'll email you with directions and parking details.",
+    } satisfies Partial<TourBookingBlockData>,
+  },
+  AvailabilityBlock: {
+    label: "Availability Calendar",
+    schema: availabilityBlockSchema,
+    defaults: {
+      heading: "Availability",
+      subheading: "Check available dates before your inquiry.",
+      monthsAhead: 3,
+    } satisfies Partial<AvailabilityBlockData>,
   },
   ContactFormBlock: {
     label: "Contact Form",

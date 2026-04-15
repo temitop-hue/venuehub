@@ -15,6 +15,9 @@ export {
   siteSettings,
   navigation,
   media,
+  tourBookings,
+  invites,
+  blockedDates,
 } from "./schema";
 export { db, type Database } from "./client";
 export * from "./schema";

@@ -210,6 +210,59 @@ export const BLOCK_FIELDS: Record<string, FieldDef[]> = {
       },
     },
   ],
+  FAQBlock: [
+    { name: "eyebrow", label: "Eyebrow", type: { kind: "text" } },
+    { name: "heading", label: "Heading", type: { kind: "text" } },
+    { name: "subheading", label: "Subheading", type: { kind: "textarea", rows: 2 } },
+    {
+      name: "faqs",
+      label: "Questions",
+      type: {
+        kind: "arrayOfObjects",
+        itemLabel: "FAQ",
+        titleField: "question",
+        fields: [
+          { name: "question", label: "Question", type: { kind: "text" } },
+          { name: "answer", label: "Answer", type: { kind: "textarea", rows: 3 } },
+          { name: "category", label: "Category (optional)", type: { kind: "text", placeholder: "e.g. Pricing" } },
+        ],
+      },
+    },
+  ],
+  TourBookingBlock: [
+    { name: "eyebrow", label: "Eyebrow", type: { kind: "text" } },
+    { name: "heading", label: "Heading", type: { kind: "text" } },
+    { name: "subheading", label: "Subheading", type: { kind: "textarea", rows: 2 } },
+    { name: "introText", label: "Intro text", type: { kind: "textarea", rows: 3 } },
+    {
+      name: "availableDays",
+      label: "Available days",
+      description: "Which days of the week tours are offered.",
+      type: {
+        kind: "arrayOfStrings",
+        itemLabel: "Day",
+        placeholder: "mon / tue / wed / thu / fri / sat / sun",
+      },
+    },
+    {
+      name: "slotTimes",
+      label: "Tour times",
+      description: "HH:mm in 24-hour format, e.g. 10:00, 14:00.",
+      type: { kind: "arrayOfStrings", itemLabel: "Time", placeholder: "14:00" },
+    },
+    { name: "successMessage", label: "Success message", type: { kind: "textarea", rows: 2 } },
+  ],
+  AvailabilityBlock: [
+    { name: "eyebrow", label: "Eyebrow", type: { kind: "text" } },
+    { name: "heading", label: "Heading", type: { kind: "text" } },
+    { name: "subheading", label: "Subheading", type: { kind: "textarea", rows: 2 } },
+    {
+      name: "monthsAhead",
+      label: "Months to show",
+      description: "How many months of availability to display (1–12).",
+      type: { kind: "number", min: 1, max: 12, step: 1 },
+    },
+  ],
   ContactFormBlock: [
     { name: "eyebrow", label: "Eyebrow", type: { kind: "text" } },
     { name: "heading", label: "Heading", type: { kind: "text" } },

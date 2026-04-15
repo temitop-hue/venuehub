@@ -12,6 +12,9 @@ import { PaymentsPage } from "./pages/PaymentsPage";
 import { GuestsPage } from "./pages/GuestsPage";
 import { SiteBuilder } from "./site-builder/SiteBuilder";
 import { SettingsPage } from "./pages/SettingsPage";
+import { ToursPage } from "./pages/ToursPage";
+import { TeamPage } from "./pages/TeamPage";
+import { InviteAcceptPage } from "./pages/InviteAcceptPage";
 import { SiteRoute } from "./public-site/SiteRoute";
 import { MarketingHome } from "./marketing/MarketingHome";
 import { BasicsStep } from "./onboarding/BasicsStep";
@@ -67,6 +70,10 @@ function App() {
         <Route path="/staff" element={<AppRoute><StaffPage /></AppRoute>} />
         <Route path="/analytics" element={<AppRoute><AnalyticsPage /></AppRoute>} />
         <Route path="/settings" element={<AppRoute><SettingsPage /></AppRoute>} />
+        <Route path="/tours" element={<AppRoute><ToursPage /></AppRoute>} />
+        <Route path="/team" element={<AppRoute><TeamPage /></AppRoute>} />
+
+        <Route path="/invite/:token" element={<InviteAcceptPage />} />
 
         <Route path="/onboarding" element={<Navigate to="/onboarding/basics" />} />
         <Route path="/onboarding/basics" element={<PrivateRoute><BasicsStep /></PrivateRoute>} />
