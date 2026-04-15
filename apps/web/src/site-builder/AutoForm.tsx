@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import type { FieldDef } from "@venuehub/shared";
 import { MediaUploadField } from "./MediaUploadField";
+import { Plus, Trash2, ChevronDown, ChevronRight, ArrowUp, ArrowDown } from "lucide-react";
 
 const colors = {
   border: "#e8e8e4",
@@ -168,6 +169,25 @@ function FieldControl({
           accept={t.accept}
         />
       );
+    case "arrayOfStrings":
+      return (
+        <ArrayOfStrings
+          value={Array.isArray(value) ? (value as string[]) : []}
+          onChange={onChange}
+          itemLabel={t.itemLabel ?? "Item"}
+          placeholder={t.placeholder}
+        />
+      );
+    case "arrayOfObjects":
+      return (
+        <ArrayOfObjects
+          value={Array.isArray(value) ? (value as Record<string, unknown>[]) : []}
+          onChange={onChange}
+          itemLabel={t.itemLabel}
+          fields={t.fields}
+          titleField={t.titleField}
+        />
+      );
     case "json": {
       const pretty = stringifyForEditor(value);
       return (
@@ -206,6 +226,290 @@ function stringifyForEditor(value: unknown): string {
   } catch {
     return String(value ?? "");
   }
+}
+
+// ---------- Array editors ----------
+
+const repeaterColors = {
+  border: "#e8e8e4",
+  borderActive: "rgba(201,168,106,0.35)",
+  bg: "#fafaf5",
+  bgHover: "#f4f4ef",
+  muted: "#6e6e76",
+  dim: "#9b9ba1",
+  text: "#17171a",
+  accent: "#c9a86a",
+  danger: "#b91c1c",
+};
+
+function repeaterFrame(): React.CSSProperties {
+  return {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.5rem",
+    padding: "0.5rem",
+    background: repeaterColors.bg,
+    border: `1px solid ${repeaterColors.border}`,
+    borderRadius: "6px",
+  };
+}
+
+function itemFrame(open: boolean): React.CSSProperties {
+  return {
+    background: "white",
+    border: `1px solid ${open ? repeaterColors.borderActive : repeaterColors.border}`,
+    borderRadius: "4px",
+    overflow: "hidden",
+  };
+}
+
+const itemHeader: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: "0.375rem",
+  padding: "0.5rem 0.75rem",
+  fontSize: "0.8125rem",
+  color: repeaterColors.text,
+};
+
+const iconBtn: React.CSSProperties = {
+  width: "1.5rem",
+  height: "1.5rem",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "transparent",
+  border: "none",
+  color: repeaterColors.muted,
+  cursor: "pointer",
+  borderRadius: "3px",
+};
+
+const addBtn: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "0.375rem",
+  padding: "0.5rem 0.75rem",
+  background: repeaterColors.accent,
+  color: "#0d0d0d",
+  border: "none",
+  borderRadius: "4px",
+  fontSize: "0.75rem",
+  fontWeight: 600,
+  cursor: "pointer",
+  alignSelf: "flex-start",
+};
+
+function move<T>(arr: T[], from: number, to: number): T[] {
+  if (to < 0 || to >= arr.length) return arr;
+  const next = arr.slice();
+  const [item] = next.splice(from, 1);
+  next.splice(to, 0, item);
+  return next;
+}
+
+function ArrayOfStrings({
+  value,
+  onChange,
+  itemLabel,
+  placeholder,
+}: {
+  value: string[];
+  onChange: (v: string[]) => void;
+  itemLabel: string;
+  placeholder?: string;
+}) {
+  return (
+    <div style={repeaterFrame()}>
+      {value.length === 0 && (
+        <div
+          style={{
+            padding: "0.75rem",
+            textAlign: "center",
+            color: repeaterColors.dim,
+            fontSize: "0.8125rem",
+          }}
+        >
+          No {itemLabel.toLowerCase()}s yet.
+        </div>
+      )}
+      {value.map((v, i) => (
+        <div key={i} style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
+          <input
+            type="text"
+            value={v}
+            placeholder={placeholder}
+            onChange={(e) => {
+              const next = value.slice();
+              next[i] = e.target.value;
+              onChange(next);
+            }}
+            style={{
+              flex: 1,
+              padding: "0.5rem 0.625rem",
+              fontSize: "0.875rem",
+              fontFamily: '"Inter", sans-serif',
+              color: repeaterColors.text,
+              background: "white",
+              border: `1px solid ${repeaterColors.border}`,
+              borderRadius: "4px",
+              outline: "none",
+            }}
+          />
+          <button
+            style={iconBtn}
+            title="Move up"
+            onClick={() => onChange(move(value, i, i - 1))}
+            disabled={i === 0}
+          >
+            <ArrowUp size={13} strokeWidth={2} />
+          </button>
+          <button
+            style={iconBtn}
+            title="Move down"
+            onClick={() => onChange(move(value, i, i + 1))}
+            disabled={i === value.length - 1}
+          >
+            <ArrowDown size={13} strokeWidth={2} />
+          </button>
+          <button
+            style={{ ...iconBtn, color: repeaterColors.danger }}
+            title={`Remove ${itemLabel.toLowerCase()}`}
+            onClick={() => {
+              const next = value.slice();
+              next.splice(i, 1);
+              onChange(next);
+            }}
+          >
+            <Trash2 size={13} strokeWidth={2} />
+          </button>
+        </div>
+      ))}
+      <button type="button" style={addBtn} onClick={() => onChange([...value, ""])}>
+        <Plus size={12} strokeWidth={2.5} /> Add {itemLabel.toLowerCase()}
+      </button>
+    </div>
+  );
+}
+
+function ArrayOfObjects({
+  value,
+  onChange,
+  itemLabel,
+  fields,
+  titleField,
+}: {
+  value: Record<string, unknown>[];
+  onChange: (v: Record<string, unknown>[]) => void;
+  itemLabel: string;
+  fields: FieldDef[];
+  titleField?: string;
+}) {
+  const [openIndex, setOpenIndex] = useState<number | null>(value.length === 0 ? null : 0);
+
+  const addItem = () => {
+    const blank: Record<string, unknown> = {};
+    for (const f of fields) {
+      if (f.type.kind === "boolean") blank[f.name] = false;
+      else if (f.type.kind === "arrayOfStrings" || f.type.kind === "arrayOfObjects") blank[f.name] = [];
+      else blank[f.name] = "";
+    }
+    const next = [...value, blank];
+    onChange(next);
+    setOpenIndex(next.length - 1);
+  };
+
+  return (
+    <div style={repeaterFrame()}>
+      {value.length === 0 && (
+        <div
+          style={{
+            padding: "0.75rem",
+            textAlign: "center",
+            color: repeaterColors.dim,
+            fontSize: "0.8125rem",
+          }}
+        >
+          No {itemLabel.toLowerCase()}s yet.
+        </div>
+      )}
+      {value.map((item, i) => {
+        const isOpen = openIndex === i;
+        const preview =
+          (titleField && typeof item[titleField] === "string" && (item[titleField] as string)) ||
+          `${itemLabel} ${i + 1}`;
+        return (
+          <div key={i} style={itemFrame(isOpen)}>
+            <div style={itemHeader}>
+              <button
+                onClick={() => setOpenIndex(isOpen ? null : i)}
+                style={{ ...iconBtn, width: "1.25rem" }}
+                title={isOpen ? "Collapse" : "Expand"}
+              >
+                {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+              </button>
+              <span
+                style={{
+                  flex: 1,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  fontWeight: 500,
+                }}
+              >
+                {preview}
+              </span>
+              <button
+                style={iconBtn}
+                title="Move up"
+                onClick={() => onChange(move(value, i, i - 1))}
+                disabled={i === 0}
+              >
+                <ArrowUp size={13} strokeWidth={2} />
+              </button>
+              <button
+                style={iconBtn}
+                title="Move down"
+                onClick={() => onChange(move(value, i, i + 1))}
+                disabled={i === value.length - 1}
+              >
+                <ArrowDown size={13} strokeWidth={2} />
+              </button>
+              <button
+                style={{ ...iconBtn, color: repeaterColors.danger }}
+                title={`Remove ${itemLabel.toLowerCase()}`}
+                onClick={() => {
+                  const next = value.slice();
+                  next.splice(i, 1);
+                  onChange(next);
+                  if (openIndex === i) setOpenIndex(null);
+                }}
+              >
+                <Trash2 size={13} strokeWidth={2} />
+              </button>
+            </div>
+            {isOpen && (
+              <div style={{ padding: "0.75rem 1rem 1rem", borderTop: `1px solid ${repeaterColors.border}` }}>
+                <AutoForm
+                  fields={fields}
+                  values={item}
+                  onChange={(next) => {
+                    const newArr = value.slice();
+                    newArr[i] = next;
+                    onChange(newArr);
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        );
+      })}
+      <button type="button" style={addBtn} onClick={addItem}>
+        <Plus size={12} strokeWidth={2.5} /> Add {itemLabel.toLowerCase()}
+      </button>
+    </div>
+  );
 }
 
 export function normalizeJsonFields(

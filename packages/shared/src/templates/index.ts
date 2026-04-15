@@ -254,8 +254,20 @@ export function buildHomeTemplate(params: {
         },
       },
       {
-        blockType: "CTASection",
+        blockType: "ContactFormBlock",
         displayOrder: 6,
+        blockData: {
+          eyebrow: "Start a Conversation",
+          heading: "Inquire about your event",
+          subheading: "Share a few details and we'll get back to you within one business day.",
+          submitLabel: "Send Inquiry",
+          successMessage: `Thank you — our team will reach out soon. In the meantime, we can't wait to show you around ${venueName}.`,
+          background: "secondary",
+        },
+      },
+      {
+        blockType: "CTASection",
+        displayOrder: 7,
         blockData: {
           eyebrow: "Visit Us",
           heading: "Come see the space in person",

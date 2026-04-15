@@ -121,6 +121,18 @@ export const ctaSectionSchema = z.object({
 });
 export type CtaSectionData = z.infer<typeof ctaSectionSchema>;
 
+// ------- ContactFormBlock -------
+
+export const contactFormBlockSchema = z.object({
+  eyebrow: z.string().optional(),
+  heading: z.string().default("Get in touch"),
+  subheading: z.string().optional(),
+  submitLabel: z.string().default("Send Inquiry"),
+  successMessage: z.string().default("Thanks — we'll be in touch soon."),
+  background: z.enum(["primary", "secondary"]).default("secondary"),
+});
+export type ContactFormBlockData = z.infer<typeof contactFormBlockSchema>;
+
 // ------- Registry -------
 
 export const blockRegistry = {
@@ -192,6 +204,16 @@ export const blockRegistry = {
       alignment: "center",
       overlayOpacity: 0.55,
     } satisfies Partial<CtaSectionData>,
+  },
+  ContactFormBlock: {
+    label: "Contact Form",
+    schema: contactFormBlockSchema,
+    defaults: {
+      heading: "Get in touch",
+      submitLabel: "Send Inquiry",
+      successMessage: "Thanks — we'll be in touch soon.",
+      background: "secondary",
+    } satisfies Partial<ContactFormBlockData>,
   },
 } as const;
 

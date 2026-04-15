@@ -7,6 +7,7 @@ import { FeatureList } from "./blocks/FeatureList";
 import { PricingTable } from "./blocks/PricingTable";
 import { TestimonialSection } from "./blocks/TestimonialSection";
 import { CTASection } from "./blocks/CTASection";
+import { ContactFormBlock } from "./blocks/ContactFormBlock";
 
 export function BlockRenderer({
   type,
@@ -38,6 +39,8 @@ export function BlockRenderer({
         return <TestimonialSection {...parseBlockData("TestimonialSection", data)} />;
       case "CTASection":
         return <CTASection {...parseBlockData("CTASection", data)} />;
+      case "ContactFormBlock":
+        return <ContactFormBlock {...parseBlockData("ContactFormBlock", data)} />;
       default: {
         const _exhaustive: never = type;
         return _exhaustive;

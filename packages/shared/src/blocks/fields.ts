@@ -11,6 +11,8 @@ export type FieldType =
   | { kind: "boolean" }
   | { kind: "select"; options: { value: string; label: string }[] }
   | { kind: "media"; accept: "image" | "video" | "image-or-video"; placeholder?: string }
+  | { kind: "arrayOfStrings"; itemLabel?: string; placeholder?: string }
+  | { kind: "arrayOfObjects"; itemLabel: string; fields: FieldDef[]; titleField?: string }
   | { kind: "json"; placeholder?: string };
 
 export interface FieldDef {
@@ -107,8 +109,16 @@ export const BLOCK_FIELDS: Record<string, FieldDef[]> = {
     {
       name: "images",
       label: "Images",
-      description: "Array of { url, alt, caption? }",
-      type: { kind: "json", placeholder: '[{"url":"https://…","alt":"…"}]' },
+      type: {
+        kind: "arrayOfObjects",
+        itemLabel: "Image",
+        titleField: "alt",
+        fields: [
+          { name: "url", label: "Image", type: { kind: "media", accept: "image" } },
+          { name: "alt", label: "Alt text", type: { kind: "text", placeholder: "Short description for screen readers" } },
+          { name: "caption", label: "Caption (optional)", type: { kind: "text" } },
+        ],
+      },
     },
   ],
   FeatureList: [
@@ -132,8 +142,17 @@ export const BLOCK_FIELDS: Record<string, FieldDef[]> = {
     {
       name: "features",
       label: "Features",
-      description: "Array of { title, description?, icon?, imageUrl? }",
-      type: { kind: "json" },
+      type: {
+        kind: "arrayOfObjects",
+        itemLabel: "Feature",
+        titleField: "title",
+        fields: [
+          { name: "title", label: "Title", type: { kind: "text" } },
+          { name: "description", label: "Description", type: { kind: "textarea", rows: 2 } },
+          { name: "icon", label: "Icon (emoji or symbol)", type: { kind: "text", placeholder: "✦" } },
+          { name: "imageUrl", label: "Image (optional)", type: { kind: "media", accept: "image" } },
+        ],
+      },
     },
   ],
   PricingTable: [
@@ -143,8 +162,25 @@ export const BLOCK_FIELDS: Record<string, FieldDef[]> = {
     {
       name: "plans",
       label: "Plans",
-      description: "Array of { name, price, priceNote?, description?, features[], ctaLabel?, ctaHref?, highlighted }",
-      type: { kind: "json" },
+      type: {
+        kind: "arrayOfObjects",
+        itemLabel: "Plan",
+        titleField: "name",
+        fields: [
+          { name: "name", label: "Name", type: { kind: "text", placeholder: "Signature" } },
+          { name: "price", label: "Price", type: { kind: "text", placeholder: "$12,500" } },
+          { name: "priceNote", label: "Price note", type: { kind: "text", placeholder: "Starting at" } },
+          { name: "description", label: "Description", type: { kind: "textarea", rows: 2 } },
+          {
+            name: "features",
+            label: "Included features",
+            type: { kind: "arrayOfStrings", itemLabel: "Feature", placeholder: "e.g. 5-hour venue rental" },
+          },
+          { name: "ctaLabel", label: "CTA label", type: { kind: "text" } },
+          { name: "ctaHref", label: "CTA link", type: { kind: "text" } },
+          { name: "highlighted", label: "Highlight as featured", type: { kind: "boolean" } },
+        ],
+      },
     },
   ],
   TestimonialSection: [
@@ -159,8 +195,42 @@ export const BLOCK_FIELDS: Record<string, FieldDef[]> = {
     {
       name: "testimonials",
       label: "Testimonials",
-      description: "Array of { quote, authorName, authorTitle?, eventType?, rating?, imageUrl? }",
-      type: { kind: "json" },
+      type: {
+        kind: "arrayOfObjects",
+        itemLabel: "Testimonial",
+        titleField: "authorName",
+        fields: [
+          { name: "quote", label: "Quote", type: { kind: "textarea", rows: 4 } },
+          { name: "authorName", label: "Author name", type: { kind: "text" } },
+          { name: "authorTitle", label: "Author title", type: { kind: "text", placeholder: "Bride & Groom" } },
+          { name: "eventType", label: "Event type", type: { kind: "text", placeholder: "Wedding, 180 guests" } },
+          { name: "rating", label: "Rating (1–5)", type: { kind: "number", min: 1, max: 5, step: 1 } },
+          { name: "imageUrl", label: "Author photo (optional)", type: { kind: "media", accept: "image" } },
+        ],
+      },
+    },
+  ],
+  ContactFormBlock: [
+    { name: "eyebrow", label: "Eyebrow", type: { kind: "text" } },
+    { name: "heading", label: "Heading", type: { kind: "text" } },
+    { name: "subheading", label: "Subheading", type: { kind: "textarea", rows: 2 } },
+    { name: "submitLabel", label: "Submit button label", type: { kind: "text" } },
+    {
+      name: "successMessage",
+      label: "Success message",
+      description: "Shown after a visitor submits the form.",
+      type: { kind: "textarea", rows: 2 },
+    },
+    {
+      name: "background",
+      label: "Background",
+      type: {
+        kind: "select",
+        options: [
+          { value: "secondary", label: "Secondary (light)" },
+          { value: "primary", label: "Primary (dark)" },
+        ],
+      },
     },
   ],
   CTASection: [
