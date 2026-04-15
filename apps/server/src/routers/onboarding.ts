@@ -12,7 +12,7 @@ import {
 } from "@venuehub/db";
 import {
   TONE_PRESETS,
-  buildHomeTemplate,
+  buildSitePages,
   type Tone,
 } from "@venuehub/shared";
 
@@ -152,7 +152,7 @@ export const onboardingRouter = router({
         });
       }
 
-      const template = buildHomeTemplate({
+      const sitePages = buildSitePages({
         venueName: tenant.name,
         city: input.city,
         state: input.state,
@@ -160,39 +160,52 @@ export const onboardingRouter = router({
         capacity: input.capacity,
       });
 
-      const existingPage = await db.query.pages.findFirst({
-        where: (p, { eq, and }) =>
-          and(eq(p.tenantId, ctx.tenantId), eq(p.slug, template.slug)),
-      });
-      if (existingPage) {
-        await db.delete(blocks).where(eq(blocks.pageId, existingPage.id));
-        await db.delete(pages).where(eq(pages.id, existingPage.id));
+      const allExisting = await db
+        .select({ id: pages.id })
+        .from(pages)
+        .where(eq(pages.tenantId, ctx.tenantId));
+      for (const p of allExisting) {
+        await db.delete(blocks).where(eq(blocks.pageId, p.id));
       }
+      await db.delete(pages).where(eq(pages.tenantId, ctx.tenantId));
 
-      const [pageResult] = await db.insert(pages).values({
-        tenantId: ctx.tenantId,
-        slug: template.slug,
-        title: template.title,
-        metaTitle: template.metaTitle,
-        metaDescription: template.metaDescription,
-        isPublished: true,
-        displayOrder: template.displayOrder,
-      });
-      const pageId = pageResult.insertId;
+      const interpolate = (data: Record<string, unknown>): Record<string, unknown> => {
+        const out: Record<string, unknown> = {};
+        for (const [k, v] of Object.entries(data)) {
+          if (typeof v === "string") out[k] = v.replace(/__SLUG__/g, tenant.slug);
+          else out[k] = v;
+        }
+        return out;
+      };
 
-      for (const b of template.blocks) {
-        await db.insert(blocks).values({
-          pageId,
-          blockType: b.blockType,
-          blockData: b.blockData,
-          displayOrder: b.displayOrder,
-          isVisible: true,
+      let firstPageSlug = "home";
+      for (const tplPage of sitePages) {
+        const [pageResult] = await db.insert(pages).values({
+          tenantId: ctx.tenantId,
+          slug: tplPage.slug,
+          title: tplPage.title,
+          metaTitle: tplPage.metaTitle,
+          metaDescription: tplPage.metaDescription,
           isPublished: true,
-          isCurrentDraft: false,
+          displayOrder: tplPage.displayOrder,
         });
+        const pageId = pageResult.insertId;
+        if (tplPage.slug === "home") firstPageSlug = tplPage.slug;
+
+        for (const b of tplPage.blocks) {
+          await db.insert(blocks).values({
+          pageId,
+            blockType: b.blockType,
+            blockData: interpolate(b.blockData as Record<string, unknown>),
+            displayOrder: b.displayOrder,
+            isVisible: true,
+            isPublished: true,
+            isCurrentDraft: false,
+          });
+        }
       }
 
-      return { success: true, pageSlug: template.slug, tenantSlug: tenant.slug };
+      return { success: true, pageSlug: firstPageSlug, tenantSlug: tenant.slug };
     }),
 
   complete: protectedProcedure.mutation(async ({ ctx }) => {

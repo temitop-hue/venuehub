@@ -84,21 +84,263 @@ const placeholder = (name: string, location: string) => ({
   alt: `${name} at ${location}`,
 });
 
-export function buildHomeTemplate(params: {
+export interface TemplateParams {
   venueName: string;
   city: string;
   state: string;
   primaryEventType: string;
   capacity: number;
-}): TemplatePage {
+}
+
+const HERO_IMG = "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=2400&q=80";
+const VENUE_IMG = "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=2000&q=80";
+const GALLERY_IMGS = [
+  { url: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1200&q=80", alt: "Candlelit reception" },
+  { url: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80", alt: "Garden ceremony" },
+  { url: "https://images.unsplash.com/photo-1478146896981-b80fe463b330?auto=format&fit=crop&w=1200&q=80", alt: "Grand ballroom" },
+  { url: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80", alt: "Venue interior" },
+  { url: "https://images.unsplash.com/photo-1465495976277-4387d4b0e4a6?auto=format&fit=crop&w=1200&q=80", alt: "Lounge setting" },
+  { url: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=80", alt: "Evening view" },
+];
+
+export function buildSitePages(params: TemplateParams): TemplatePage[] {
   const { venueName, city, state, primaryEventType, capacity } = params;
-  const location = `${city}, ${state}`;
+  const location = city && state ? `${city}, ${state}` : city || state || "";
+
+  const home = buildHomePage(params);
+  const ourVenue: TemplatePage = {
+    slug: "our-venue",
+    title: "Our Venue",
+    metaTitle: `Our Venue — ${venueName}`,
+    metaDescription: `Tour the spaces, amenities, and details that make ${venueName} special.`,
+    displayOrder: 1,
+    blocks: [
+      {
+        blockType: "HeroBlock",
+        displayOrder: 0,
+        blockData: {
+          headline: "Inside our venue",
+          subheadline: location ? `An intimate look at our spaces in ${location}.` : "An intimate look at our spaces.",
+          backgroundType: "image",
+          backgroundUrl: VENUE_IMG,
+          overlayOpacity: 0.45,
+          ctaLabel: "Book a Tour",
+          ctaHref: "/v/__SLUG__/book-a-tour",
+          alignment: "center",
+          height: "large",
+        },
+      },
+      {
+        blockType: "TextSection",
+        displayOrder: 1,
+        blockData: {
+          eyebrow: "The Space",
+          heading: "Designed for the moments that matter",
+          body: `From the soaring ceilings of our grand hall to the quiet retreat of our bridal suite, every corner of ${venueName} was crafted with intention. Whether you're hosting an intimate dinner or a celebration for ${capacity} guests, the space adapts around your vision.`,
+          alignment: "center",
+          maxWidth: "medium",
+          background: "secondary",
+          paddingY: "xl",
+        },
+      },
+      {
+        blockType: "FeatureList",
+        displayOrder: 2,
+        blockData: {
+          eyebrow: "Amenities",
+          heading: "Everything included",
+          layout: "grid",
+          columns: 3,
+          features: [
+            { icon: "✦", title: "Grand Hall", description: `Our main event space accommodates up to ${capacity} guests with flexible floor plans.` },
+            { icon: "✦", title: "Outdoor Terrace", description: "A landscaped patio for cocktail hours and ceremonies." },
+            { icon: "✦", title: "Bridal Suite", description: "A private retreat with natural light and dedicated entry." },
+            { icon: "✦", title: "Catering Kitchen", description: "Commercial-grade prep space for our partner caterers." },
+            { icon: "✦", title: "On-Site Parking", description: "Complimentary parking with valet available." },
+            { icon: "✦", title: "AV & Lighting", description: "Professional sound, lighting, and projection built in." },
+          ],
+        },
+      },
+      {
+        blockType: "GallerySection",
+        displayOrder: 3,
+        blockData: {
+          eyebrow: "Spaces",
+          heading: "Walk through with us",
+          layout: "grid",
+          columns: 3,
+          gap: "normal",
+          aspectRatio: "landscape",
+          images: GALLERY_IMGS.slice(0, 6),
+        },
+      },
+      {
+        blockType: "CTASection",
+        displayOrder: 4,
+        blockData: {
+          eyebrow: "See It For Yourself",
+          heading: "Book a private tour",
+          subheading: "Walk the floor plan with our team. Tours typically take 45 minutes.",
+          primaryCtaLabel: "Schedule a Tour",
+          primaryCtaHref: "/v/__SLUG__/book-a-tour",
+          backgroundType: "image",
+          backgroundValue: VENUE_IMG,
+          overlayOpacity: 0.6,
+          alignment: "center",
+        },
+      },
+    ],
+  };
+
+  const gallery: TemplatePage = {
+    slug: "gallery",
+    title: "Gallery",
+    metaTitle: `Gallery — ${venueName}`,
+    metaDescription: `A look at past events at ${venueName}.`,
+    displayOrder: 2,
+    blocks: [
+      {
+        blockType: "HeroBlock",
+        displayOrder: 0,
+        blockData: {
+          headline: "Moments at " + venueName,
+          subheadline: "A glimpse of the celebrations that have happened here.",
+          backgroundType: "image",
+          backgroundUrl: GALLERY_IMGS[0].url,
+          overlayOpacity: 0.4,
+          alignment: "center",
+          height: "medium",
+        },
+      },
+      {
+        blockType: "GallerySection",
+        displayOrder: 1,
+        blockData: {
+          layout: "masonry",
+          columns: 3,
+          gap: "normal",
+          aspectRatio: "auto",
+          images: GALLERY_IMGS,
+        },
+      },
+    ],
+  };
+
+  const packagesPage: TemplatePage = {
+    slug: "packages",
+    title: "Packages & Pricing",
+    metaTitle: `Packages — ${venueName}`,
+    metaDescription: `Pricing and packages for events at ${venueName}.`,
+    displayOrder: 3,
+    blocks: [
+      {
+        blockType: "HeroBlock",
+        displayOrder: 0,
+        blockData: {
+          headline: "Packages & Pricing",
+          subheadline: "Two ways to celebrate. Both fully customizable.",
+          backgroundType: "image",
+          backgroundUrl: VENUE_IMG,
+          overlayOpacity: 0.5,
+          alignment: "center",
+          height: "medium",
+        },
+      },
+      {
+        blockType: "PricingTable",
+        displayOrder: 1,
+        blockData: {
+          eyebrow: "Choose Your Experience",
+          heading: "Two ways to celebrate",
+          subheading: "Both packages include full-service coordination and can be tailored to your event.",
+          plans: [
+            {
+              name: "Essential",
+              price: "$X,XXX",
+              priceNote: "Starting at",
+              description: `For intimate gatherings up to ${Math.floor(capacity / 2)} guests.`,
+              features: ["5-hour venue rental", "Ceremony & reception setup", "Dedicated event coordinator", "Premium linens & place settings"],
+              ctaLabel: "Inquire",
+              ctaHref: "/v/__SLUG__/contact",
+              highlighted: false,
+            },
+            {
+              name: "Signature",
+              price: "$XX,XXX",
+              priceNote: "Starting at",
+              description: `Our signature all-inclusive package for up to ${capacity} guests.`,
+              features: ["8-hour venue rental", "Custom design & floor plan", "Lead coordinator + 2 assistants", "Premium linens, chairs, & tableware", "Valet parking & concierge", "Bridal suite with concierge"],
+              ctaLabel: "Inquire",
+              ctaHref: "/v/__SLUG__/contact",
+              highlighted: true,
+            },
+          ],
+        },
+      },
+      {
+        blockType: "ContactFormBlock",
+        displayOrder: 2,
+        blockData: {
+          eyebrow: "Get a Quote",
+          heading: "Tell us about your event",
+          subheading: "Share a few details and we'll send personalized pricing within one business day.",
+          submitLabel: "Request a Quote",
+          successMessage: "Thanks — your quote request is in. Expect to hear from us soon.",
+          background: "secondary",
+        },
+      },
+    ],
+  };
+
+  const contact: TemplatePage = {
+    slug: "contact",
+    title: "Contact",
+    metaTitle: `Contact ${venueName}`,
+    metaDescription: `Get in touch with ${venueName}.`,
+    displayOrder: 4,
+    blocks: [
+      {
+        blockType: "HeroBlock",
+        displayOrder: 0,
+        blockData: {
+          headline: "Get in touch",
+          subheadline: "Tell us about your event and we'll be in touch within one business day.",
+          backgroundType: "image",
+          backgroundUrl: VENUE_IMG,
+          overlayOpacity: 0.55,
+          alignment: "center",
+          height: "medium",
+        },
+      },
+      {
+        blockType: "ContactFormBlock",
+        displayOrder: 1,
+        blockData: {
+          eyebrow: "Inquire",
+          heading: "Send us a message",
+          subheading: "We respond to every inquiry personally — no auto-replies.",
+          submitLabel: "Send Inquiry",
+          successMessage: `Thank you — our team will reach out soon. In the meantime, we can't wait to show you around ${venueName}.`,
+          background: "secondary",
+        },
+      },
+    ],
+  };
+
+  return [home, ourVenue, gallery, packagesPage, contact];
+}
+
+export function buildHomePage(params: TemplateParams): TemplatePage {
+  const { venueName, city, state, primaryEventType, capacity } = params;
+  const location = city && state ? `${city}, ${state}` : "";
 
   return {
     slug: "home",
     title: "Home",
-    metaTitle: `${venueName} — ${primaryEventType} in ${location}`,
-    metaDescription: `Host ${primaryEventType.toLowerCase()} and unforgettable events at ${venueName} in ${location}.`,
+    metaTitle: location ? `${venueName} — ${primaryEventType} in ${location}` : `${venueName}`,
+    metaDescription: location
+      ? `Host ${primaryEventType.toLowerCase()} and unforgettable events at ${venueName} in ${location}.`
+      : `Host ${primaryEventType.toLowerCase()} and unforgettable events at ${venueName}.`,
     displayOrder: 0,
     blocks: [
       {

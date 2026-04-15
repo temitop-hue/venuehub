@@ -2,7 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { asc, eq, and } from "drizzle-orm";
 import { publicProcedure, router } from "../trpc";
-import { db, blocks, navigation, leads } from "@venuehub/db";
+import { db, blocks, navigation, leads, pages } from "@venuehub/db";
 
 export const publicSiteRouter = router({
   getBySlug: publicProcedure
@@ -20,7 +20,7 @@ export const publicSiteRouter = router({
         throw new TRPCError({ code: "NOT_FOUND", message: "Site not found" });
       }
 
-      const [theme, settings, navRows, page] = await Promise.all([
+      const [theme, settings, navRows, page, publishedPagesList] = await Promise.all([
         db.query.tenantThemes.findFirst({
           where: (x, { eq }) => eq(x.tenantId, tenant.id),
         }),
@@ -36,6 +36,16 @@ export const publicSiteRouter = router({
           where: (p, { eq, and }) =>
             and(eq(p.tenantId, tenant.id), eq(p.slug, input.pageSlug), eq(p.isPublished, true)),
         }),
+        db
+          .select({
+            id: pages.id,
+            slug: pages.slug,
+            title: pages.title,
+            displayOrder: pages.displayOrder,
+          })
+          .from(pages)
+          .where(and(eq(pages.tenantId, tenant.id), eq(pages.isPublished, true)))
+          .orderBy(asc(pages.displayOrder), asc(pages.id)),
       ]);
 
       if (!page) {
@@ -59,6 +69,7 @@ export const publicSiteRouter = router({
         theme: theme ?? null,
         settings: settings ?? null,
         navigation: navRows,
+        publishedPages: publishedPagesList,
         page,
         blocks: pageBlocks,
       };

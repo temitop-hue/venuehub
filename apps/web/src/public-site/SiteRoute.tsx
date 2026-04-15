@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { trpc } from "../trpc";
 import { ThemeProvider } from "./ThemeProvider";
 import { BlockRenderer } from "./BlockRenderer";
+import { TenantHeader } from "./TenantHeader";
 
 export function SiteRoute() {
   const { slug, pageSlug } = useParams<{ slug: string; pageSlug?: string }>();
@@ -72,6 +73,13 @@ export function SiteRoute() {
 
   return (
     <ThemeProvider theme={data.theme}>
+      <TenantHeader
+        tenantSlug={data.tenant.slug}
+        tenantName={data.tenant.name}
+        logoUrl={data.theme?.logoUrl ?? null}
+        pages={data.publishedPages ?? []}
+        currentPageSlug={effectivePage}
+      />
       <main>
         {data.blocks.map((block) => (
           <BlockRenderer key={block.id} type={block.blockType} data={block.blockData} />
